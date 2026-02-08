@@ -3,7 +3,6 @@ using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure MongoDB
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
 
@@ -20,8 +19,10 @@ builder.Services.AddScoped(sp =>
     return client.GetDatabase(settings?.DatabaseName ?? "Planno");
 });
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
-app.MapGet("/health", () => Results.Ok("OK"));
+app.MapControllers();
 
 app.Run("http://0.0.0.0:8080");
