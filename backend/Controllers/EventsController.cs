@@ -61,5 +61,23 @@ namespace Backend.Controllers
             await _events.InsertOneAsync(calendarEvent);
             return CreatedAtAction(nameof(GetById), new { id = calendarEvent.Id }, calendarEvent);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(string id, [FromBody] CalendarEvent updatedEvent)
+        {
+            var eventFound = await _events.Find(e => e.Id == id).FirstOrDefaultAsync();
+
+            if (eventFound == null)
+            {
+                return NotFound();
+            }
+
+            updatedEvent.Id = eventFound.Id;
+            updatedEvent.UpdatedAt = DateTime.UtcNow;
+
+            await _events.ReplaceOneAsync(e => e.Id == id, updatedEvent);
+
+            return NoContent();
+        }
     }
 }
