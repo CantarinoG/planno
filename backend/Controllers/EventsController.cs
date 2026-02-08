@@ -79,5 +79,18 @@ namespace Backend.Controllers
 
             return NoContent();
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var result = await _events.DeleteOneAsync(e => e.Id == id);
+
+            if (result.DeletedCount == 0)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
+        }
     }
 }
