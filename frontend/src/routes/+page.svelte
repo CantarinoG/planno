@@ -4,7 +4,8 @@
     <h1 class="text-sky-700 text-6xl font-black mb-4 tracking-tight">
         Hello World!
     </h1>
-    <p class="text-sky-900 text-xl font-medium opacity-80">
+    <p class="text-sky-900 text-xl font-medium opacity-80 mb-6">
         Welcome to your SvelteKit project.
     </p>
+    <button class="btn btn-primary">DaisyUI Working!</button>
 </div>
