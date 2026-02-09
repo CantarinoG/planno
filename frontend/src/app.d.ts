@@ -10,4 +10,14 @@ declare global {
 	}
 }
 
-export {};
+export { };
+
+declare module 'svelte/elements' {
+	export interface HTMLAttributes<T> {
+		slot?: string;
+	}
+
+	export interface SVGAttributes<T> {
+		slot?: string;
+	}
+}
