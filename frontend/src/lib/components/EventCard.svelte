@@ -1,14 +1,13 @@
 <script lang="ts">
     export let title: string = "Event";
-    export let startTime: string = "09:00"; // Format: "HH:MM"
-    export let endTime: string = "10:00"; // Format: "HH:MM"
-    export let color: string = "blue"; // blue, green, orange, purple, etc.
+    export let startTime: string = "09:00";
+    export let endTime: string = "10:00";
+    export let color: string = "blue";
     export let top: number = 0; // Position in pixels from top
     export let height: number = 80; // Height in pixels
     export let column: number = 0; // Which column this event is in (for overlapping events)
     export let totalColumns: number = 1; // Total number of columns in this overlap group
 
-    // Color mapping for different event types
     const colorClasses: Record<string, string> = {
         blue: "bg-blue-500 hover:bg-blue-600",
         green: "bg-green-500 hover:bg-green-600",
@@ -20,7 +19,6 @@
 
     $: bgColor = colorClasses[color] || colorClasses.blue;
 
-    // Calculate width and left position based on column layout
     $: widthPercent = 100 / totalColumns;
     $: leftPercent = (100 / totalColumns) * column;
 </script>

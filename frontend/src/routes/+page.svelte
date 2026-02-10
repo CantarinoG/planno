@@ -12,31 +12,31 @@
         isSameMonth,
     } from "date-fns";
 
-    let isSidebarOpen = true;
-    let currentDate = new Date();
+    let isSidebarOpen: boolean = true;
+    let currentDate: Date = new Date();
 
-    function toggleSidebar() {
+    function toggleSidebar(): void {
         isSidebarOpen = !isSidebarOpen;
     }
 
-    function nextWeek() {
+    function nextWeek(): void {
         currentDate = addWeeks(currentDate, 1);
     }
 
-    function prevWeek() {
+    function prevWeek(): void {
         currentDate = subWeeks(currentDate, 1);
     }
 
-    function goToToday() {
+    function goToToday(): void {
         currentDate = new Date();
     }
 
-    $: weekStart = startOfWeek(currentDate, { weekStartsOn: 0 }); // Sunday start
+    $: weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
     $: weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
 
-    $: dateRangeString = (() => {
-        const startFormat = "MMM d";
-        const endFormat = isSameMonth(weekStart, weekEnd)
+    $: dateRangeString = ((): string => {
+        const startFormat: string = "MMM d";
+        const endFormat: string = isSameMonth(weekStart, weekEnd)
             ? "d, yyyy"
             : "MMM d, yyyy";
         return `${format(weekStart, startFormat)} – ${format(weekEnd, endFormat)}`;
@@ -45,15 +45,14 @@
     // Format date for MiniCalendar (YYYY-MM-DD)
     $: formattedDate = format(currentDate, "yyyy-MM-dd");
 
-    function handleDateChange(event: CustomEvent<string>) {
-        console.log("Page received datechange:", event.detail);
-        // Event detail contains the new date string YYYY-MM-DD
-        // We parse manually to ensure it's treated as local time
-        const [year, month, day] = event.detail.split("-").map(Number);
-        const newDate = new Date(year, month - 1, day);
+    // Date change in MiniCalendar
+    function handleDateChange(event: CustomEvent<string>): void {
+        const [year, month, day]: number[] = event.detail
+            .split("-")
+            .map(Number);
+        const newDate: Date = new Date(year, month - 1, day);
 
         if (!isNaN(newDate.getTime())) {
-            // Check validity
             currentDate = newDate;
         } else {
             console.error("Invalid date received:", event.detail);
@@ -80,7 +79,6 @@
                 transition:fly={{ duration: 200 }}
             ></div>
 
-            <!-- Sidebar Container -->
             <div
                 class="absolute inset-y-0 left-0 z-50 h-full lg:static lg:z-auto shadow-xl lg:shadow-none bg-base-100"
                 transition:fly={{ x: -288, duration: 200 }}

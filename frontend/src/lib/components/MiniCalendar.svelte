@@ -1,21 +1,21 @@
 <script lang="ts">
     import { createEventDispatcher, onMount } from "svelte";
 
-    export let value = new Date().toISOString().split("T")[0];
-    const dispatch = createEventDispatcher();
+    export let value: string = new Date().toISOString().split("T")[0];
+    const dispatch = createEventDispatcher<{
+        datechange: string;
+    }>();
 
-    // We can interact with the calendar element if needed
     let calendar: HTMLElement;
 
-    function handleChange(event: any) {
-        console.log("MiniCalendar manual change event:", event);
-        console.log("New value:", event.target.value);
-        dispatch("datechange", event.target.value);
+    function handleChange(event: any): void {
+        const newValue: string = (event.target as any).value;
+        dispatch("datechange", newValue);
     }
 
-    onMount(() => {
-        let cleanup = () => {};
-        (async () => {
+    onMount((): (() => void) => {
+        let cleanup: () => void = () => {};
+        (async (): Promise<void> => {
             await import("cally");
             if (calendar) {
                 calendar.addEventListener("change", handleChange);
@@ -32,8 +32,6 @@
 
 <div class="calendar-wrapper">
     <!-- Cally Calendar Component -->
-    <!-- 'cally' class activates DaisyUI styling -->
-    <!-- We override the primary color locally to match our bg-blue-600 -->
     <calendar-date
         class="cally w-full bg-base-100 border-none shadow-none"
         {value}
@@ -41,7 +39,6 @@
         show-outside-days="true"
         bind:this={calendar}
     >
-        <!-- Custom Icons matching our design -->
         <button
             class="btn btn-ghost btn-circle btn-sm text-base-content/60 hover:text-base-content"
             aria-label="Previous Week"
@@ -86,24 +83,12 @@
 </div>
 
 <style>
-    /* 
-       Override DaisyUI/Cally variables to match bg-blue-600 (#2563eb)
-       DaisyUI uses Oklch, but we can set the hex/rgb variables that Cally might use or standard variables.
-       For DaisyUI v5, it uses --p (primary) for active states.
-    */
     .calendar-wrapper :global(.cally) {
-        /* Approximate blue-600 in OKLCH for consistency with DaisyUI v5 if needed, 
-           or standard CSS variable overrides if supported by the theme. 
-           Let's try to set the primary color for this scope.
-        */
         --p: 53.6% 0.201 267.4; /* OKLCH value for blue-600 approx */
-        --r: 0.5rem; /* Rounded corners */
+        --r: 0.5rem;
         font-size: 0.8rem;
     }
 
-    /* 
-       Ensure the calendar fits safely in the container 
-    */
     .calendar-wrapper {
         width: 100%;
         max-width: 100%;

@@ -1,13 +1,12 @@
-<script>
-    export let toggleSidebar = () => {};
-    export let dateRangeString = "";
-    export let onNext = () => {};
-    export let onPrev = () => {};
-    export let onToday = () => {};
+<script lang="ts">
+    export let toggleSidebar: () => void = () => {};
+    export let dateRangeString: string = "";
+    export let onNext: () => void = () => {};
+    export let onPrev: () => void = () => {};
+    export let onToday: () => void = () => {};
 </script>
 
-<nav class="navbar bg-base-100 border-b border-base-200 px-4 py-2">
-    <!-- Navbar Start: Toggle & Logo -->
+<nav class="navbar bg-base-100 border-b border-base-300 px-4 py-2">
     <div class="navbar-start gap-2 sm:gap-4">
         <button
             class="btn btn-ghost btn-circle btn-sm"
@@ -57,7 +56,7 @@
             </a>
 
             <button
-                class="btn btn-sm btn-outline border-base-300 bg-base-100 hover:bg-base-200 px-5 font-bold text-base-content/70 hidden md:inline-flex"
+                class="btn btn-sm btn-outline border-base-300 bg-base-100 hover:bg-base-300 px-5 font-bold text-base-content/70 hidden md:inline-flex"
                 onclick={onToday}
             >
                 Today
@@ -65,7 +64,6 @@
         </div>
     </div>
 
-    <!-- Navbar Center: Date Navigation -->
     <div class="navbar-center">
         <div class="flex items-center gap-2 sm:gap-8">
             <button
@@ -113,6 +111,5 @@
         </div>
     </div>
 
-    <!-- Navbar End: Empty for balance -->
     <div class="navbar-end"></div>
 </nav>

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { addDays, format, isSameDay } from "date-fns";
 
-    export let weekStart = new Date();
+    export let weekStart: Date = new Date();
 
     type WeekDay = {
         date: Date;
@@ -12,22 +12,25 @@
 
     let weekDays: WeekDay[] = [];
     $: {
-        weekDays = Array.from({ length: 7 }, (_, i) => {
-            const day = addDays(weekStart, i);
-            return {
-                date: day,
-                name: format(day, "EEE").toUpperCase(), // MON, TUE...
-                number: format(day, "d"), // 23, 24...
-                isToday: isSameDay(day, new Date()),
-            };
-        });
+        weekDays = Array.from(
+            { length: 7 },
+            (_: unknown, i: number): WeekDay => {
+                const day: Date = addDays(weekStart, i);
+                return {
+                    date: day,
+                    name: format(day, "EEE").toUpperCase(),
+                    number: format(day, "d"),
+                    isToday: isSameDay(day, new Date()),
+                };
+            },
+        );
     }
 </script>
 
-<div class="grid grid-cols-7 border-b border-base-200 bg-base-100">
+<div class="grid grid-cols-7 border-b border-base-300 bg-base-100">
     {#each weekDays as day}
         <div
-            class="flex flex-col items-center justify-center py-3 border-r border-base-200 last:border-r-0 {day.isToday
+            class="flex flex-col items-center justify-center py-3 border-r border-base-300 last:border-r-0 {day.isToday
                 ? 'bg-blue-50/30'
                 : ''}"
         >

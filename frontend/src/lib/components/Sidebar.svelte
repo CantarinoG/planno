@@ -1,13 +1,12 @@
 <script lang="ts">
     import MiniCalendar from "./MiniCalendar.svelte";
 
-    export let date = "";
+    export let date: string = "";
 </script>
 
 <aside
-    class="w-72 bg-base-100 border-r border-base-200 flex flex-col h-full overflow-hidden"
+    class="w-72 bg-base-100 border-r border-base-300 flex flex-col h-full overflow-hidden"
 >
-    <!-- Create Event Button -->
     <div class="p-4 pt-6">
         <button
             class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold w-full rounded-2xl shadow-lg border-none flex items-center justify-center gap-2 py-4 h-auto transition-transform hover:scale-[1.02] active:scale-[0.98]"
@@ -33,7 +32,6 @@
         </button>
     </div>
 
-    <!-- Mini Calendar -->
     <div
         class="flex-1 px-2 py-4 overflow-y-auto overflow-x-hidden scrollbar-hide"
     >
