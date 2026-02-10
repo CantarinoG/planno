@@ -2,6 +2,7 @@
     import Navbar from "$lib/components/Navbar.svelte";
     import Sidebar from "$lib/components/Sidebar.svelte";
     import CalendarGrid from "$lib/components/CalendarGrid.svelte";
+    import EventModal from "$lib/components/EventModal.svelte";
     import { fly } from "svelte/transition";
     import {
         addWeeks,
@@ -13,6 +14,7 @@
     } from "date-fns";
 
     let isSidebarOpen: boolean = true;
+    let isEventModalOpen: boolean = false;
     let currentDate: Date = new Date();
 
     function toggleSidebar(): void {
@@ -86,9 +88,20 @@
                 <Sidebar
                     date={formattedDate}
                     on:datechange={handleDateChange}
+                    on:create={() => (isEventModalOpen = true)}
                 />
             </div>
         {/if}
         <CalendarGrid {weekStart} />
     </main>
+
+    <EventModal
+        isOpen={isEventModalOpen}
+        date={formattedDate}
+        on:close={() => (isEventModalOpen = false)}
+        on:save={(e) => {
+            console.log("Event saved:", e.detail);
+            isEventModalOpen = false;
+        }}
+    />
 </div>

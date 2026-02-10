@@ -1,5 +1,8 @@
 <script lang="ts">
+    import { createEventDispatcher } from "svelte";
     import MiniCalendar from "./MiniCalendar.svelte";
+
+    const dispatch = createEventDispatcher();
 
     export let date: string = "";
 </script>
@@ -10,6 +13,7 @@
     <div class="p-4 pt-6">
         <button
             class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold w-full rounded-2xl shadow-lg border-none flex items-center justify-center gap-2 py-4 h-auto transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            onclick={() => dispatch("create")}
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -40,12 +44,12 @@
 
     <div class="p-4 border-t border-base-200">
         <p class="text-xs text-base-content/60 text-center">
-            Made by <a 
-                href="https://github.com/CantarinoG" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                class="link link-hover text-blue-500 font-medium"
-            >@CantarinoG</a>
+            Made by <a
+                href="https://github.com/CantarinoG"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="link link-hover text-blue-500 font-medium">@CantarinoG</a
+            >
         </p>
     </div>
 </aside>

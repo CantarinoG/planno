@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { getColorById } from "$lib/constants/colors";
+
     export let title: string = "Event";
     export let startTime: string = "09:00";
     export let endTime: string = "10:00";
@@ -8,16 +10,7 @@
     export let column: number = 0; // Which column this event is in (for overlapping events)
     export let totalColumns: number = 1; // Total number of columns in this overlap group
 
-    const colorClasses: Record<string, string> = {
-        blue: "bg-blue-500 hover:bg-blue-600",
-        green: "bg-green-500 hover:bg-green-600",
-        orange: "bg-orange-400 hover:bg-orange-500",
-        purple: "bg-purple-500 hover:bg-purple-600",
-        red: "bg-red-500 hover:bg-red-600",
-        teal: "bg-teal-500 hover:bg-teal-600",
-    };
-
-    $: bgColor = colorClasses[color] || colorClasses.blue;
+    $: bgColor = getColorById(color).bgClass;
 
     $: widthPercent = 100 / totalColumns;
     $: leftPercent = (100 / totalColumns) * column;
