@@ -1,7 +1,49 @@
-<script>
+<script lang="ts">
     import CalendarHeader from "$lib/components/CalendarHeader.svelte";
+    import { onMount, onDestroy } from "svelte";
+    import { isSameDay } from "date-fns";
 
     export let weekStart = new Date(); // Default if not provided
+
+    let currentTime = new Date();
+    let intervalId: number | undefined;
+
+    // Calculate if current time is within the displayed week
+    $: isCurrentWeekDisplayed = (() => {
+        const now = new Date();
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 7);
+        return now >= weekStart && now < weekEnd;
+    })();
+
+    // Calculate the top position based on current time (in pixels)
+    // Each hour is 80px (h-20 = 5rem = 80px)
+    $: currentTimeTop = (() => {
+        const hours = currentTime.getHours();
+        const minutes = currentTime.getMinutes();
+        const totalMinutes = hours * 60 + minutes;
+        const pixelsPerMinute = 80 / 60; // 80px per hour / 60 minutes
+        return totalMinutes * pixelsPerMinute;
+    })();
+
+    onMount(() => {
+        // Update current time every minute
+        intervalId = window.setInterval(() => {
+            currentTime = new Date();
+        }, 60000); // Update every 60 seconds
+
+        return () => {
+            if (intervalId !== undefined) {
+                clearInterval(intervalId);
+            }
+        };
+    });
+
+    onDestroy(() => {
+        if (intervalId !== undefined) {
+            clearInterval(intervalId);
+        }
+    });
 </script>
 
 <div class="flex-1 flex flex-col overflow-hidden bg-base-100">
@@ -67,15 +109,18 @@
                     </div>
                 {/each}
 
-                <!-- Current Time Indicator (Mock) -->
-                <div
-                    class="absolute left-0 right-0 top-[310px] flex items-center pointer-events-none z-10"
-                >
+                <!-- Current Time Indicator (Dynamic) -->
+                {#if isCurrentWeekDisplayed}
                     <div
-                        class="w-2 h-2 rounded-full bg-red-500 -ml-1 absolute left-0"
-                    ></div>
-                    <div class="h-[2px] bg-red-500 flex-1 ml-1"></div>
-                </div>
+                        class="absolute left-0 right-0 flex items-center pointer-events-none z-10"
+                        style="top: {currentTimeTop}px;"
+                    >
+                        <div
+                            class="w-2 h-2 rounded-full bg-red-500 -ml-1 absolute left-0"
+                        ></div>
+                        <div class="h-[2px] bg-red-500 flex-1 ml-1"></div>
+                    </div>
+                {/if}
             </div>
         </div>
     </div>
