@@ -30,9 +30,14 @@
     let selectedColorId: string = DEFAULT_COLOR_ID;
 
     $: if (isOpen && date) {
-        const now: Date = new Date();
         const start: Date = new Date(date);
-        start.setHours(now.getHours(), 0, 0, 0);
+
+        const hasTime = date.includes("T") && date.length > 10;
+
+        if (!hasTime) {
+            const now: Date = new Date();
+            start.setHours(now.getHours(), 0, 0, 0);
+        }
 
         const end: Date = new Date(start);
         end.setHours(start.getHours() + 1);

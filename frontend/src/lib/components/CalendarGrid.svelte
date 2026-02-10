@@ -1,12 +1,35 @@
 <script lang="ts">
     import CalendarHeader from "$lib/components/CalendarHeader.svelte";
     import EventCard from "$lib/components/EventCard.svelte";
-    import { onMount, onDestroy } from "svelte";
+    import { onMount, onDestroy, createEventDispatcher } from "svelte";
 
     export let weekStart: Date = new Date();
 
+    const dispatch = createEventDispatcher<{
+        cellclick: { date: Date };
+    }>();
+
     let currentTime: Date = new Date();
     let intervalId: number | undefined;
+
+    function handleCellClick(dayIndex: number, event: MouseEvent): void {
+        const rect = (
+            event.currentTarget as HTMLElement
+        ).getBoundingClientRect();
+        const y = event.clientY - rect.top;
+        const pixelsPerHour = 80;
+        const totalMinutes = (y / pixelsPerHour) * 60;
+
+        const roundedMinutes = Math.round(totalMinutes / 15) * 15;
+        const hours = Math.floor(roundedMinutes / 60);
+        const minutes = roundedMinutes % 60;
+
+        const clickedDate = new Date(weekStart);
+        clickedDate.setDate(weekStart.getDate() + dayIndex);
+        clickedDate.setHours(hours, minutes, 0, 0);
+
+        dispatch("cellclick", { date: clickedDate });
+    }
 
     function timeToPixels(hours: number, minutes: number): number {
         const totalMinutes = hours * 60 + minutes;
@@ -266,10 +289,19 @@
                     <!-- Day columns -->
                     {#each Array(7) as _, i}
                         <div
-                            class="border-r border-base-300 last:border-r-0 relative {i ===
+                            role="button"
+                            aria-label="Create event in day column"
+                            tabindex="0"
+                            class="border-r border-base-300 last:border-r-0 relative cursor-pointer {i ===
                             0
                                 ? 'bg-blue-50/10'
                                 : ''}"
+                            onclick={(e) => handleCellClick(i, e)}
+                            onkeydown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                    handleCellClick(i, e as any);
+                                }
+                            }}
                         >
                             <!-- Hour rows -->
                             {#each Array(24) as _}

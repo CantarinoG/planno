@@ -16,6 +16,17 @@
     let isSidebarOpen: boolean = true;
     let isEventModalOpen: boolean = false;
     let currentDate: Date = new Date();
+    let selectedDateStr: string = format(new Date(), "yyyy-MM-dd");
+
+    function openEventModal(): void {
+        selectedDateStr = format(currentDate, "yyyy-MM-dd");
+        isEventModalOpen = true;
+    }
+
+    function handleCellClick(event: CustomEvent<{ date: Date }>): void {
+        selectedDateStr = format(event.detail.date, "yyyy-MM-dd'T'HH:mm");
+        isEventModalOpen = true;
+    }
 
     function toggleSidebar(): void {
         isSidebarOpen = !isSidebarOpen;
@@ -31,6 +42,15 @@
 
     function goToToday(): void {
         currentDate = new Date();
+    }
+
+    function closeEventModal(): void {
+        isEventModalOpen = false;
+    }
+
+    function saveEvent(e: CustomEvent): void {
+        console.log("Event saved:", e.detail);
+        isEventModalOpen = false;
     }
 
     $: weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
@@ -86,22 +106,19 @@
                 transition:fly={{ x: -288, duration: 200 }}
             >
                 <Sidebar
-                    date={formattedDate}
+                    date={selectedDateStr.split("T")[0]}
                     on:datechange={handleDateChange}
-                    on:create={() => (isEventModalOpen = true)}
+                    on:create={openEventModal}
                 />
             </div>
         {/if}
-        <CalendarGrid {weekStart} />
+        <CalendarGrid {weekStart} on:cellclick={handleCellClick} />
     </main>
 
     <EventModal
-        isOpen={isEventModalOpen}
-        date={formattedDate}
-        on:close={() => (isEventModalOpen = false)}
-        on:save={(e) => {
-            console.log("Event saved:", e.detail);
-            isEventModalOpen = false;
-        }}
+        bind:isOpen={isEventModalOpen}
+        date={selectedDateStr}
+        on:close={closeEventModal}
+        on:save={saveEvent}
     />
 </div>
