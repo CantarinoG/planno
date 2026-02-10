@@ -53,6 +53,10 @@
                 "application/json",
                 JSON.stringify({
                     id,
+                    title,
+                    description,
+                    color,
+                    isAllDay,
                     durationMinutes: calculateDurationMinutes(
                         startTime,
                         endTime,

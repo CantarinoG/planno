@@ -149,18 +149,19 @@
     }
 
     async function handleEventMove(
-        event: CustomEvent<{ id: string; startAt: string; endAt: string }>,
+        event: CustomEvent<{
+            id: string;
+            startAt: string;
+            endAt: string;
+            eventData: any;
+        }>,
     ): Promise<void> {
-        const { id, startAt, endAt } = event.detail;
+        const { id, startAt, endAt, eventData } = event.detail;
         console.log(`Moving event ${id} to ${startAt} - ${endAt}`);
-
-        // Find existing event to preserve its data
-        const existingEvent = events.find((e) => e.id === id);
-        if (!existingEvent) return;
 
         try {
             await updateCalendarEvent(id, {
-                ...existingEvent,
+                ...eventData,
                 startAt,
                 endAt,
             });
@@ -241,6 +242,8 @@
             on:cellclick={handleCellClick}
             on:eventclick={handleEventClick}
             on:eventmove={handleEventMove}
+            on:navprev={prevWeek}
+            on:navnext={nextWeek}
         />
     </main>
 

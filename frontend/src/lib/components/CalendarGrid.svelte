@@ -21,14 +21,49 @@
     const dispatch = createEventDispatcher<{
         cellclick: { date: Date };
         eventclick: { event: any };
-        eventmove: { id: string; startAt: string; endAt: string };
+        eventmove: {
+            id: string;
+            startAt: string;
+            endAt: string;
+            eventData: any;
+        };
+        navprev: void;
+        navnext: void;
     }>();
 
-    function handleDragOver(e: DragEvent): void {
+    let navTimeout: number | undefined;
+
+    function clearNavTimeout(): void {
+        if (navTimeout) {
+            clearTimeout(navTimeout);
+            navTimeout = undefined;
+        }
+    }
+
+    function handleDragOver(e: DragEvent, dayIndex: number): void {
         e.preventDefault();
         if (e.dataTransfer) {
             e.dataTransfer.dropEffect = "move";
         }
+
+        // Week navigation sensors
+        if (dayIndex === 0 && !navTimeout) {
+            navTimeout = window.setTimeout(() => {
+                dispatch("navprev");
+                navTimeout = undefined;
+            }, 1000);
+        } else if (dayIndex === 6 && !navTimeout) {
+            navTimeout = window.setTimeout(() => {
+                dispatch("navnext");
+                navTimeout = undefined;
+            }, 1000);
+        } else if (dayIndex !== 0 && dayIndex !== 6) {
+            clearNavTimeout();
+        }
+    }
+
+    function handleDragLeave(): void {
+        clearNavTimeout();
     }
 
     function handleDrop(e: DragEvent, dayIndex: number): void {
@@ -37,7 +72,8 @@
         if (!data) return;
 
         try {
-            const { id, durationMinutes } = JSON.parse(data);
+            const eventData = JSON.parse(data);
+            const { durationMinutes } = eventData;
 
             // Get coordinates relative to the column
             const rect = (
@@ -56,10 +92,12 @@
             const newEnd = addMinutes(newStart, durationMinutes);
 
             dispatch("eventmove", {
-                id,
+                id: eventData.id,
                 startAt: newStart.toISOString(),
                 endAt: newEnd.toISOString(),
+                eventData,
             });
+            clearNavTimeout();
         } catch (err) {
             console.error("Failed to process drop:", err);
         }
@@ -278,7 +316,8 @@
                                 ? 'bg-blue-50/10'
                                 : ''}"
                             onclick={(e) => handleCellClick(i, e)}
-                            ondragover={handleDragOver}
+                            ondragover={(e) => handleDragOver(e, i)}
+                            ondragleave={handleDragLeave}
                             ondrop={(e) => handleDrop(e, i)}
                             onkeydown={(e) => {
                                 if (e.key === "Enter" || e.key === " ") {
