@@ -21,10 +21,14 @@
     } from "$lib/api";
     import { isLoading, addToast } from "$lib/stores";
 
+    import ConfirmModal from "$lib/components/ConfirmModal.svelte";
+
     const DEFAULT_COLOR_ID: string = "blue";
 
     let isSidebarOpen: boolean = true;
     let isEventModalOpen: boolean = false;
+    let isConfirmModalOpen: boolean = false;
+    let eventToDeleteId: string | null = null;
     let currentDate: Date = new Date();
     let selectedDateStr: string = format(new Date(), "yyyy-MM-dd");
     let events: CalendarEvent[] = [];
@@ -155,24 +159,35 @@
         isEventModalOpen = false;
     }
 
-    async function handleDelete(): Promise<void> {
-        if (!editEventId) return;
-
-        if (confirm("Are you sure you want to delete this event?")) {
-            isLoading.set(true);
-            try {
-                await deleteCalendarEvent(editEventId);
-                console.log("Event deleted successfully");
-                addToast("Event deleted successfully", "success");
-                await loadEvents(); // Refresh list
-            } catch (error) {
-                console.error("Failed to delete event:", error);
-                addToast("Failed to delete event. Please try again.", "error");
-            } finally {
-                isLoading.set(false);
-            }
-        }
+    function handleDeleteRequest(id: string): void {
+        eventToDeleteId = id;
+        isConfirmModalOpen = true;
         isEventModalOpen = false;
+    }
+
+    function handleDeleteFromModal(): void {
+        if (editEventId) {
+            handleDeleteRequest(editEventId);
+        }
+    }
+
+    async function executeDelete(): Promise<void> {
+        if (!eventToDeleteId) return;
+
+        isLoading.set(true);
+        try {
+            await deleteCalendarEvent(eventToDeleteId);
+            console.log("Event deleted successfully");
+            addToast("Event deleted successfully", "success");
+            await loadEvents(); // Refresh list
+        } catch (error) {
+            console.error("Failed to delete event:", error);
+            addToast("Failed to delete event. Please try again.", "error");
+        } finally {
+            isLoading.set(false);
+            isConfirmModalOpen = false;
+            eventToDeleteId = null;
+        }
     }
 
     async function handleEventMove(
@@ -314,6 +329,19 @@
         initialIsAllDay={editIsAllDay}
         on:close={closeEventModal}
         on:save={saveEvent}
-        on:delete={handleDelete}
+        on:delete={handleDeleteFromModal}
+    />
+
+    <ConfirmModal
+        bind:isOpen={isConfirmModalOpen}
+        title="Delete Event"
+        message="Are you sure you want to delete this event? This action cannot be undone."
+        confirmText="Delete"
+        type="danger"
+        on:confirm={executeDelete}
+        on:cancel={() => {
+            isConfirmModalOpen = false;
+            eventToDeleteId = null;
+        }}
     />
 </div>
