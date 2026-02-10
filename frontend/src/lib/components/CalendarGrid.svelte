@@ -2,8 +2,10 @@
     import CalendarHeader from "$lib/components/CalendarHeader.svelte";
     import EventCard from "$lib/components/EventCard.svelte";
     import { onMount, onDestroy, createEventDispatcher } from "svelte";
+    import { format, getHours, getMinutes, getDay } from "date-fns";
 
     export let weekStart: Date = new Date();
+    export let events: any[] = [];
 
     const dispatch = createEventDispatcher<{
         cellclick: { date: Date };
@@ -51,59 +53,73 @@
         return durationMinutes * pixelsPerMinute;
     }
 
-    // Mock events for demonstration
-    type CalendarEvent = {
+    type LayoutEvent = {
+        id?: string;
         title: string;
-        startTime: string;
-        endTime: string;
+        startTime: string; // HH:mm for display
+        endTime: string; // HH:mm for display
+        startAt: string; // Full ISO
+        endAt: string; // Full ISO
         color: string;
         description?: string;
         isAllDay?: boolean;
-        dayIndex: number; // 0-6 for Sunday-Saturday
+        dayIndex: number;
         top: number;
         height: number;
-        // Layout properties for overlap handling
         column?: number;
         totalColumns?: number;
     };
 
-    function eventsOverlap(
-        event1: CalendarEvent,
-        event2: CalendarEvent,
-    ): boolean {
+    function eventsOverlap(event1: LayoutEvent, event2: LayoutEvent): boolean {
         const end1: number = event1.top + event1.height;
         const end2: number = event2.top + event2.height;
         return event1.top < end2 && end1 > event2.top;
     }
 
-    function calculateEventLayout(events: CalendarEvent[]): CalendarEvent[] {
-        const eventsByDay: Record<number, CalendarEvent[]> = {};
-        events.forEach((event) => {
+    function calculateEventLayout(backendEvents: any[]): LayoutEvent[] {
+        const processedEvents: LayoutEvent[] = backendEvents.map((event) => {
+            const start = new Date(event.startAt);
+            const end = new Date(event.endAt);
+
+            return {
+                ...event,
+                startTime: format(start, "HH:mm"),
+                endTime: format(end, "HH:mm"),
+                dayIndex: getDay(start),
+                top: timeToPixels(getHours(start), getMinutes(start)),
+                height: durationToPixels(
+                    getHours(start),
+                    getMinutes(start),
+                    getHours(end),
+                    getMinutes(end),
+                ),
+            };
+        });
+
+        const eventsByDay: Record<number, LayoutEvent[]> = {};
+        processedEvents.forEach((event) => {
             if (!eventsByDay[event.dayIndex]) {
                 eventsByDay[event.dayIndex] = [];
             }
             eventsByDay[event.dayIndex].push(event);
         });
 
-        const layoutEvents: CalendarEvent[] = [];
-        Object.values(eventsByDay).forEach((dayEvents: CalendarEvent[]) => {
-            const sorted: CalendarEvent[] = [...dayEvents].sort(
-                (a: CalendarEvent, b: CalendarEvent): number => {
+        const layoutEvents: LayoutEvent[] = [];
+        Object.values(eventsByDay).forEach((dayEvents: LayoutEvent[]) => {
+            const sorted: LayoutEvent[] = [...dayEvents].sort(
+                (a: LayoutEvent, b: LayoutEvent): number => {
                     if (a.top !== b.top) return a.top - b.top;
                     return b.height - a.height;
                 },
             );
 
-            const columns: CalendarEvent[][] = [];
-            sorted.forEach((event: CalendarEvent) => {
+            const columns: LayoutEvent[][] = [];
+            sorted.forEach((event: LayoutEvent) => {
                 let placed: boolean = false;
                 for (let i: number = 0; i < columns.length; i++) {
-                    const columnEvents: CalendarEvent[] = columns[i];
-                    const hasOverlap: boolean = columnEvents.some(
-                        (e: CalendarEvent) => eventsOverlap(e, event),
-                    );
-                    if (!hasOverlap) {
-                        columnEvents.push(event);
+                    const lastEventInColumn = columns[i][columns[i].length - 1];
+                    if (!eventsOverlap(lastEventInColumn, event)) {
+                        columns[i].push(event);
                         event.column = i;
                         placed = true;
                         break;
@@ -114,108 +130,17 @@
                     columns.push([event]);
                 }
             });
-            sorted.forEach((event: CalendarEvent) => {
-                const overlapping: CalendarEvent[] = sorted.filter(
-                    (e: CalendarEvent) =>
-                        eventsOverlap(e, event) || eventsOverlap(event, e),
-                );
-                const maxColumn: number = Math.max(
-                    ...overlapping.map((e: CalendarEvent) => e.column ?? 0),
-                );
-                event.totalColumns = maxColumn + 1;
-            });
 
-            layoutEvents.push(...sorted);
+            sorted.forEach((event: LayoutEvent) => {
+                event.totalColumns = columns.length;
+                layoutEvents.push(event);
+            });
         });
 
         return layoutEvents;
     }
 
-    const mockEvents: CalendarEvent[] = [
-        {
-            title: "Team Sync",
-            startTime: "08:00",
-            endTime: "10:00",
-            color: "blue",
-            dayIndex: 0,
-            top: timeToPixels(8, 0),
-            height: durationToPixels(8, 0, 10, 0),
-        },
-        {
-            title: "Team Sync 2",
-            startTime: "09:00",
-            endTime: "10:30",
-            color: "orange",
-            dayIndex: 0,
-            top: timeToPixels(9, 0),
-            height: durationToPixels(9, 0, 10, 30),
-        },
-        {
-            title: "Team Sync 3",
-            startTime: "09:00",
-            endTime: "11:00",
-            color: "green",
-            dayIndex: 0,
-            top: timeToPixels(9, 0),
-            height: durationToPixels(9, 0, 11, 0),
-        },
-        {
-            title: "Project Workshop",
-            startTime: "09:00",
-            endTime: "12:00",
-            color: "blue",
-            dayIndex: 2,
-            top: timeToPixels(9, 0),
-            height: durationToPixels(9, 0, 12, 0),
-        },
-        {
-            title: "Mom's Birthday",
-            startTime: "All Day Event",
-            endTime: "",
-            color: "orange",
-            dayIndex: 3,
-            top: timeToPixels(0, 0),
-            height: 40,
-        },
-        {
-            title: "Client Lunch",
-            startTime: "13:00",
-            endTime: "14:00",
-            color: "blue",
-            dayIndex: 0,
-            top: timeToPixels(13, 0),
-            height: durationToPixels(13, 0, 14, 0),
-        },
-        {
-            title: "Gym Session",
-            startTime: "15:00",
-            endTime: "17:00",
-            color: "green",
-            dayIndex: 1,
-            top: timeToPixels(15, 0),
-            height: durationToPixels(15, 0, 17, 0),
-        },
-        {
-            title: "Weekly Review",
-            startTime: "15:00",
-            endTime: "16:30",
-            color: "blue",
-            dayIndex: 4,
-            top: timeToPixels(15, 0),
-            height: durationToPixels(15, 0, 16, 30),
-        },
-        {
-            title: "Dinner Party",
-            startTime: "18:00",
-            endTime: "20:00",
-            color: "green",
-            dayIndex: 5,
-            top: timeToPixels(18, 0),
-            height: durationToPixels(18, 0, 20, 0),
-        },
-    ];
-
-    $: layoutedEvents = calculateEventLayout(mockEvents) as CalendarEvent[];
+    $: layoutedEvents = calculateEventLayout(events);
 
     $: isCurrentWeekDisplayed = (() => {
         const now: Date = new Date();
@@ -318,6 +243,8 @@
                                     title={event.title}
                                     startTime={event.startTime}
                                     endTime={event.endTime}
+                                    startAt={event.startAt}
+                                    endAt={event.endAt}
                                     color={event.color}
                                     description={event.description || ""}
                                     isAllDay={event.isAllDay || false}

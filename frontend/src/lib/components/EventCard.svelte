@@ -13,11 +13,16 @@
     export let column: number = 0; // Which column this event is in (for overlapping events)
     export let totalColumns: number = 1; // Total number of columns in this overlap group
 
+    export let startAt: string = "";
+    export let endAt: string = "";
+
     const dispatch = createEventDispatcher<{
         click: {
             title: string;
             startTime: string;
             endTime: string;
+            startAt: string;
+            endAt: string;
             color: string;
             description: string;
             isAllDay: boolean;
@@ -30,6 +35,8 @@
             title,
             startTime,
             endTime,
+            startAt,
+            endAt,
             color,
             description,
             isAllDay,

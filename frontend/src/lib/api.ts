@@ -27,3 +27,19 @@ export async function createCalendarEvent(event: Omit<CalendarEvent, 'id' | 'cre
 
     return response.json();
 }
+
+export async function getCalendarEvents(startDate?: string, endDate?: string): Promise<CalendarEvent[]> {
+    const params = new URLSearchParams();
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+
+    const url = `${API_BASE_URL}/Events${params.toString() ? `?${params.toString()}` : ''}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to fetch events: ${errorText || response.statusText}`);
+    }
+
+    return response.json();
+}

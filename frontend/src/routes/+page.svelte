@@ -12,14 +12,15 @@
         format,
         isSameMonth,
     } from "date-fns";
-    import { createCalendarEvent } from "$lib/api";
+    import { createCalendarEvent, getCalendarEvents } from "$lib/api";
 
-    const DEFAULT_COLOR_ID: string = "blue"; // Define DEFAULT_COLOR_ID
+    const DEFAULT_COLOR_ID: string = "blue";
 
     let isSidebarOpen: boolean = true;
     let isEventModalOpen: boolean = false;
     let currentDate: Date = new Date();
     let selectedDateStr: string = format(new Date(), "yyyy-MM-dd");
+    let events: any[] = [];
 
     // Edit fields
     let editTitle: string = "";
@@ -27,6 +28,18 @@
     let editColorId: string = DEFAULT_COLOR_ID;
     let editEndDate: string = "";
     let editIsAllDay: boolean = false;
+
+    async function loadEvents(): Promise<void> {
+        try {
+            const start = weekStart.toISOString();
+            const end = weekEnd.toISOString();
+            console.log(`Fetching events from ${start} to ${end}`);
+            events = await getCalendarEvents(start, end);
+            console.log("Fetched events:", events);
+        } catch (error) {
+            console.error("Failed to load events:", error);
+        }
+    }
 
     function openEventModal(): void {
         selectedDateStr = format(currentDate, "yyyy-MM-dd");
@@ -50,29 +63,13 @@
 
     function handleEventClick(event: CustomEvent<{ event: any }>): void {
         const detail = event.detail.event;
-        selectedDateStr = detail.startTime.includes("T")
-            ? detail.startTime
-            : format(new Date(), "yyyy-MM-dd'T'") + detail.startTime;
-
-        // Correcting date string if it's just time
-        if (!selectedDateStr.includes("-")) {
-            selectedDateStr =
-                format(currentDate, "yyyy-MM-dd'T'") + detail.startTime;
-        }
+        selectedDateStr = detail.startAt;
 
         editTitle = detail.title;
         editDescription = detail.description || "";
         editColorId = detail.color;
         editIsAllDay = detail.isAllDay || false;
-
-        // For end date, we might need more logic but let's assume it's also provided or calculated
-        if (detail.endTime) {
-            editEndDate = detail.endTime.includes("T")
-                ? detail.endTime
-                : format(currentDate, "yyyy-MM-dd'T'") + detail.endTime;
-        } else {
-            editEndDate = "";
-        }
+        editEndDate = detail.endAt;
 
         isEventModalOpen = true;
     }
@@ -110,6 +107,7 @@
                 color: detail.color,
             });
             console.log("Event saved successfully:", newEvent);
+            await loadEvents(); // Refresh list
         } catch (error) {
             console.error("Failed to save event:", error);
             alert("Error saving event. Please try again.");
@@ -125,6 +123,10 @@
 
     $: weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
     $: weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
+
+    $: if (weekStart && weekEnd) {
+        loadEvents();
+    }
 
     $: dateRangeString = ((): string => {
         const startFormat: string = "MMM d";
@@ -184,6 +186,7 @@
         {/if}
         <CalendarGrid
             {weekStart}
+            {events}
             on:cellclick={handleCellClick}
             on:eventclick={handleEventClick}
         />
