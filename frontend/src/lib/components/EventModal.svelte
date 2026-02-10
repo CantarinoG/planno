@@ -9,9 +9,15 @@
 
     export let isOpen: boolean = false;
     export let date: string = "";
+    export let initialTitle: string = "";
+    export let initialDescription: string = "";
+    export let initialColorId: string = DEFAULT_COLOR_ID;
+    export let initialEndDate: string = "";
+    export let initialIsAllDay: boolean = false;
 
     const dispatch = createEventDispatcher<{
         close: null;
+        delete: null;
         save: {
             title: string;
             isAllDay: boolean;
@@ -28,22 +34,44 @@
     let endDate: string = "";
     let description: string = "";
     let selectedColorId: string = DEFAULT_COLOR_ID;
+    let isEdit: boolean = false;
 
-    $: if (isOpen && date) {
-        const start: Date = new Date(date);
+    $: if (isOpen) {
+        isEdit = !!(initialTitle || initialDescription || initialEndDate);
+        if (isEdit) {
+            // Edit mode initialization
+            title = initialTitle;
+            description = initialDescription;
+            selectedColorId = initialColorId;
+            isAllDay = initialIsAllDay;
+            startDate = date;
+            endDate =
+                initialEndDate ||
+                format(
+                    new Date(new Date(date).getTime() + 3600000),
+                    "yyyy-MM-dd'T'HH:mm",
+                );
+        } else if (date) {
+            // Create mode initialization
+            title = "";
+            description = "";
+            selectedColorId = DEFAULT_COLOR_ID;
+            isAllDay = false;
 
-        const hasTime = date.includes("T") && date.length > 10;
+            const start: Date = new Date(date);
+            const hasTime = date.includes("T") && date.length > 10;
 
-        if (!hasTime) {
-            const now: Date = new Date();
-            start.setHours(now.getHours(), 0, 0, 0);
+            if (!hasTime) {
+                const now: Date = new Date();
+                start.setHours(now.getHours(), 0, 0, 0);
+            }
+
+            const end: Date = new Date(start);
+            end.setHours(start.getHours() + 1);
+
+            startDate = format(start, "yyyy-MM-dd'T'HH:mm");
+            endDate = format(end, "yyyy-MM-dd'T'HH:mm");
         }
-
-        const end: Date = new Date(start);
-        end.setHours(start.getHours() + 1);
-
-        startDate = format(start, "yyyy-MM-dd'T'HH:mm");
-        endDate = format(end, "yyyy-MM-dd'T'HH:mm");
     }
 
     function close(): void {
@@ -60,6 +88,13 @@
             color: selectedColorId,
         });
         close();
+    }
+
+    function handleDelete(): void {
+        if (confirm("Are you sure you want to delete this event?")) {
+            dispatch("delete");
+            close();
+        }
     }
 
     function handleBackdropClick(e: MouseEvent): void {
@@ -85,7 +120,7 @@
                 <h2
                     class="text-xs font-bold text-base-content/40 tracking-widest uppercase"
                 >
-                    Create New Event
+                    {isEdit ? "Update Event" : "Create New Event"}
                 </h2>
                 <button
                     class="btn btn-ghost btn-circle btn-sm text-base-content/40 hover:text-base-content"
@@ -310,18 +345,50 @@
             </div>
 
             <div
-                class="flex items-center justify-end gap-4 p-8 bg-base-200/20 border-t border-base-300"
+                class="flex items-center justify-between gap-4 p-8 bg-base-200/20 border-t border-base-300"
             >
-                <button
-                    class="btn btn-ghost font-bold text-base-content/60 hover:bg-base-300 px-6"
-                    on:click={close}>Cancel</button
-                >
-                <button
-                    class="btn bg-blue-600 hover:bg-blue-700 text-white border-none font-bold px-8 shadow-lg shadow-blue-500/20"
-                    on:click={save}
-                >
-                    Save Event
-                </button>
+                <div>
+                    {#if isEdit}
+                        <button
+                            class="btn btn-ghost text-error hover:bg-error/10 font-bold px-4"
+                            on:click={handleDelete}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="mr-1"
+                                ><path
+                                    d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                                /><line x1="10" y1="11" x2="10" y2="17" /><line
+                                    x1="14"
+                                    y1="11"
+                                    x2="14"
+                                    y2="17"
+                                /></svg
+                            >
+                            Delete
+                        </button>
+                    {/if}
+                </div>
+                <div class="flex items-center gap-3">
+                    <button
+                        class="btn btn-ghost font-bold text-base-content/60 hover:bg-base-300 px-6"
+                        on:click={close}>Cancel</button
+                    >
+                    <button
+                        class="btn bg-blue-600 hover:bg-blue-700 text-white border-none font-bold px-8 shadow-lg shadow-blue-500/20"
+                        on:click={save}
+                    >
+                        {isEdit ? "Update Event" : "Save Event"}
+                    </button>
+                </div>
             </div>
         </div>
         <div class="modal-backdrop fixed inset-0"></div>

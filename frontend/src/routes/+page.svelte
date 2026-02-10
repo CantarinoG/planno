@@ -13,18 +13,66 @@
         isSameMonth,
     } from "date-fns";
 
+    const DEFAULT_COLOR_ID: string = "blue"; // Define DEFAULT_COLOR_ID
+
     let isSidebarOpen: boolean = true;
     let isEventModalOpen: boolean = false;
     let currentDate: Date = new Date();
     let selectedDateStr: string = format(new Date(), "yyyy-MM-dd");
 
+    // Edit fields
+    let editTitle: string = "";
+    let editDescription: string = "";
+    let editColorId: string = DEFAULT_COLOR_ID;
+    let editEndDate: string = "";
+    let editIsAllDay: boolean = false;
+
     function openEventModal(): void {
         selectedDateStr = format(currentDate, "yyyy-MM-dd");
+        editTitle = "";
+        editDescription = "";
+        editColorId = DEFAULT_COLOR_ID;
+        editEndDate = "";
+        editIsAllDay = false;
         isEventModalOpen = true;
     }
 
     function handleCellClick(event: CustomEvent<{ date: Date }>): void {
         selectedDateStr = format(event.detail.date, "yyyy-MM-dd'T'HH:mm");
+        editTitle = "";
+        editDescription = "";
+        editColorId = DEFAULT_COLOR_ID;
+        editEndDate = "";
+        editIsAllDay = false;
+        isEventModalOpen = true;
+    }
+
+    function handleEventClick(event: CustomEvent<{ event: any }>): void {
+        const detail = event.detail.event;
+        selectedDateStr = detail.startTime.includes("T")
+            ? detail.startTime
+            : format(new Date(), "yyyy-MM-dd'T'") + detail.startTime;
+
+        // Correcting date string if it's just time
+        if (!selectedDateStr.includes("-")) {
+            selectedDateStr =
+                format(currentDate, "yyyy-MM-dd'T'") + detail.startTime;
+        }
+
+        editTitle = detail.title;
+        editDescription = detail.description || "";
+        editColorId = detail.color;
+        editIsAllDay = detail.isAllDay || false;
+
+        // For end date, we might need more logic but let's assume it's also provided or calculated
+        if (detail.endTime) {
+            editEndDate = detail.endTime.includes("T")
+                ? detail.endTime
+                : format(currentDate, "yyyy-MM-dd'T'") + detail.endTime;
+        } else {
+            editEndDate = "";
+        }
+
         isEventModalOpen = true;
     }
 
@@ -50,6 +98,11 @@
 
     function saveEvent(e: CustomEvent): void {
         console.log("Event saved:", e.detail);
+        isEventModalOpen = false;
+    }
+
+    function handleDelete(): void {
+        console.log("Event deleted");
         isEventModalOpen = false;
     }
 
@@ -112,13 +165,23 @@
                 />
             </div>
         {/if}
-        <CalendarGrid {weekStart} on:cellclick={handleCellClick} />
+        <CalendarGrid
+            {weekStart}
+            on:cellclick={handleCellClick}
+            on:eventclick={handleEventClick}
+        />
     </main>
 
     <EventModal
         bind:isOpen={isEventModalOpen}
         date={selectedDateStr}
+        initialTitle={editTitle}
+        initialDescription={editDescription}
+        initialColorId={editColorId}
+        initialEndDate={editEndDate}
+        initialIsAllDay={editIsAllDay}
         on:close={closeEventModal}
         on:save={saveEvent}
+        on:delete={handleDelete}
     />
 </div>

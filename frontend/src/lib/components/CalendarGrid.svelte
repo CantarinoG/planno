@@ -7,6 +7,7 @@
 
     const dispatch = createEventDispatcher<{
         cellclick: { date: Date };
+        eventclick: { event: any };
     }>();
 
     let currentTime: Date = new Date();
@@ -56,6 +57,8 @@
         startTime: string;
         endTime: string;
         color: string;
+        description?: string;
+        isAllDay?: boolean;
         dayIndex: number; // 0-6 for Sunday-Saturday
         top: number;
         height: number;
@@ -316,10 +319,16 @@
                                     startTime={event.startTime}
                                     endTime={event.endTime}
                                     color={event.color}
+                                    description={event.description || ""}
+                                    isAllDay={event.isAllDay || false}
                                     top={event.top}
                                     height={event.height}
                                     column={event.column ?? 0}
                                     totalColumns={event.totalColumns ?? 1}
+                                    on:click={(e) =>
+                                        dispatch("eventclick", {
+                                            event: e.detail,
+                                        })}
                                 />
                             {/each}
                         </div>
