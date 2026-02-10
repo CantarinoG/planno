@@ -37,6 +37,17 @@
     >
         <MiniCalendar value={date} on:datechange />
     </div>
+
+    <div class="p-4 border-t border-base-200">
+        <p class="text-xs text-base-content/60 text-center">
+            Made by <a 
+                href="https://github.com/CantarinoG" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="link link-hover text-blue-500 font-medium"
+            >@CantarinoG</a>
+        </p>
+    </div>
 </aside>
 
 <style>
