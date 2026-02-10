@@ -8,55 +8,75 @@
     {#each $toasts as toast (toast.id)}
         <div
             animate:flip={{ duration: 300 }}
-            in:fly={{ y: -20, duration: 300 }}
+            in:fly={{ y: 20, duration: 300 }}
             out:fade={{ duration: 200 }}
-            class="alert alert-{toast.type} shadow-lg min-w-[300px] flex justify-between"
+            class="flex items-center justify-between p-4 rounded-xl shadow-2xl min-w-[320px] max-w-md text-white {toast.type ===
+            'success'
+                ? 'bg-gradient-to-r from-green-600 to-green-500'
+                : toast.type === 'error'
+                  ? 'bg-gradient-to-r from-red-600 to-red-500'
+                  : 'bg-gradient-to-r from-blue-600 to-blue-500'}"
         >
-            <div>
+            <div class="flex items-center gap-3">
                 {#if toast.type === "success"}
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="stroke-current flex-shrink-0 h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        ><path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        /></svg
-                    >
+                    <div class="p-1 bg-white/20 rounded-full">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="3"
+                                d="M5 13l4 4L19 7"
+                            />
+                        </svg>
+                    </div>
                 {:else if toast.type === "error"}
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="stroke-current flex-shrink-0 h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        ><path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        /></svg
-                    >
+                    <div class="p-1 bg-white/20 rounded-full">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="3"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
+                    </div>
                 {:else}
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        class="stroke-current flex-shrink-0 w-6 h-6"
-                        ><path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        ></path></svg
-                    >
+                    <div class="p-1 bg-white/20 rounded-full">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="3"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+                    </div>
                 {/if}
-                <span>{toast.message}</span>
+                <span class="font-medium text-sm tracking-wide"
+                    >{toast.message}</span
+                >
             </div>
             <button
-                class="btn btn-ghost btn-xs btn-circle"
+                class="btn btn-ghost btn-xs btn-circle text-white/80 hover:bg-white/20 hover:text-white ml-4"
+                aria-label="Close"
                 on:click={() => dismissToast(toast.id)}
             >
                 <svg
@@ -65,13 +85,14 @@
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    ><path
+                >
+                    <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
                         stroke-width="2"
                         d="M6 18L18 6M6 6l12 12"
-                    /></svg
-                >
+                    />
+                </svg>
             </button>
         </div>
     {/each}
