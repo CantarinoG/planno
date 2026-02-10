@@ -2,7 +2,18 @@
     import CalendarHeader from "$lib/components/CalendarHeader.svelte";
     import EventCard from "$lib/components/EventCard.svelte";
     import { onMount, onDestroy, createEventDispatcher } from "svelte";
-    import { format, getHours, getMinutes, getDay } from "date-fns";
+    import {
+        format,
+        getHours,
+        getMinutes,
+        getDay,
+        setMinutes,
+        setHours,
+        addMinutes,
+        addDays,
+    } from "date-fns";
+
+    const HOUR_HEIGHT = 80;
 
     export let weekStart: Date = new Date();
     export let events: any[] = [];
@@ -10,7 +21,49 @@
     const dispatch = createEventDispatcher<{
         cellclick: { date: Date };
         eventclick: { event: any };
+        eventmove: { id: string; startAt: string; endAt: string };
     }>();
+
+    function handleDragOver(e: DragEvent): void {
+        e.preventDefault();
+        if (e.dataTransfer) {
+            e.dataTransfer.dropEffect = "move";
+        }
+    }
+
+    function handleDrop(e: DragEvent, dayIndex: number): void {
+        e.preventDefault();
+        const data = e.dataTransfer?.getData("application/json");
+        if (!data) return;
+
+        try {
+            const { id, durationMinutes } = JSON.parse(data);
+
+            // Get coordinates relative to the column
+            const rect = (
+                e.currentTarget as HTMLElement
+            ).getBoundingClientRect();
+            const y = e.clientY - rect.top;
+
+            // Calculate time
+            const quarters = Math.round(y / (HOUR_HEIGHT / 4));
+            const totalMinutes = quarters * 15;
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+
+            const targetDay = addDays(weekStart, dayIndex);
+            const newStart = setMinutes(setHours(targetDay, hours), minutes);
+            const newEnd = addMinutes(newStart, durationMinutes);
+
+            dispatch("eventmove", {
+                id,
+                startAt: newStart.toISOString(),
+                endAt: newEnd.toISOString(),
+            });
+        } catch (err) {
+            console.error("Failed to process drop:", err);
+        }
+    }
 
     let currentTime: Date = new Date();
     let intervalId: number | undefined;
@@ -225,6 +278,8 @@
                                 ? 'bg-blue-50/10'
                                 : ''}"
                             onclick={(e) => handleCellClick(i, e)}
+                            ondragover={handleDragOver}
+                            ondrop={(e) => handleDrop(e, i)}
                             onkeydown={(e) => {
                                 if (e.key === "Enter" || e.key === " ") {
                                     handleCellClick(i, e as any);

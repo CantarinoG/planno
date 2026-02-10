@@ -148,6 +148,30 @@
         isEventModalOpen = false;
     }
 
+    async function handleEventMove(
+        event: CustomEvent<{ id: string; startAt: string; endAt: string }>,
+    ): Promise<void> {
+        const { id, startAt, endAt } = event.detail;
+        console.log(`Moving event ${id} to ${startAt} - ${endAt}`);
+
+        // Find existing event to preserve its data
+        const existingEvent = events.find((e) => e.id === id);
+        if (!existingEvent) return;
+
+        try {
+            await updateCalendarEvent(id, {
+                ...existingEvent,
+                startAt,
+                endAt,
+            });
+            console.log("Event moved successfully");
+            await loadEvents(); // Refresh list
+        } catch (error) {
+            console.error("Failed to move event:", error);
+            alert("Error moving event. Please try again.");
+        }
+    }
+
     $: weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
     $: weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
 
@@ -216,6 +240,7 @@
             {events}
             on:cellclick={handleCellClick}
             on:eventclick={handleEventClick}
+            on:eventmove={handleEventMove}
         />
     </main>
 

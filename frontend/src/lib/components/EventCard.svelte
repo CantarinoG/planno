@@ -47,6 +47,28 @@
         });
     }
 
+    function handleDragStart(e: DragEvent): void {
+        if (id && e.dataTransfer) {
+            e.dataTransfer.setData(
+                "application/json",
+                JSON.stringify({
+                    id,
+                    durationMinutes: calculateDurationMinutes(
+                        startTime,
+                        endTime,
+                    ),
+                }),
+            );
+            e.dataTransfer.effectAllowed = "move";
+        }
+    }
+
+    function calculateDurationMinutes(start: string, end: string): number {
+        const [startH, startM] = start.split(":").map(Number);
+        const [endH, endM] = end.split(":").map(Number);
+        return endH * 60 + endM - (startH * 60 + startM);
+    }
+
     $: bgColor = getColorById(color).bgClass;
 
     $: widthPercent = 100 / totalColumns;
@@ -56,9 +78,11 @@
 <div
     role="button"
     tabindex="0"
+    draggable="true"
     class="absolute rounded-md shadow-md cursor-pointer transition-all hover:shadow-lg hover:z-20 {bgColor} text-white px-2 py-1 overflow-hidden"
     style="top: {top}px; height: {height}px; left: {leftPercent}%; width: {widthPercent}%;"
     onclick={handleCardClick}
+    ondragstart={handleDragStart}
     onkeydown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
             handleCardClick(e as any);
