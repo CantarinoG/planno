@@ -235,7 +235,33 @@
             console.error("Invalid date received:", event.detail);
         }
     }
+
+    function handleKeydown(e: KeyboardEvent): void {
+        const target = e.target as HTMLElement;
+        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+
+        switch (e.key.toLowerCase()) {
+            case "c":
+                e.preventDefault();
+                openEventModal();
+                break;
+            case "t":
+                e.preventDefault();
+                goToToday();
+                break;
+            case "arrowleft":
+                e.preventDefault();
+                prevWeek();
+                break;
+            case "arrowright":
+                e.preventDefault();
+                nextWeek();
+                break;
+        }
+    }
 </script>
+
+<svelte:window on:keydown={handleKeydown} />
 
 <div class="h-screen flex flex-col overflow-hidden">
     <Navbar
