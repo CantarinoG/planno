@@ -19,6 +19,7 @@
         updateCalendarEvent,
         type CalendarEvent,
     } from "$lib/api";
+    import { isLoading, addToast } from "$lib/stores";
 
     const DEFAULT_COLOR_ID: string = "blue";
 
@@ -37,6 +38,7 @@
     let editIsAllDay: boolean = false;
 
     async function loadEvents(): Promise<void> {
+        isLoading.set(true);
         try {
             const start = weekStart.toISOString();
             const end = weekEnd.toISOString();
@@ -45,6 +47,9 @@
             console.log("Fetched events:", events);
         } catch (error) {
             console.error("Failed to load events:", error);
+            addToast("Failed to load events", "error");
+        } finally {
+            isLoading.set(false);
         }
     }
 
@@ -118,6 +123,7 @@
     ): Promise<void> {
         const detail = e.detail;
         console.log("Saving event to backend:", detail);
+        isLoading.set(true);
 
         try {
             const eventPayload: Omit<CalendarEvent, "id"> = {
@@ -132,14 +138,18 @@
             if (editEventId) {
                 await updateCalendarEvent(editEventId, eventPayload);
                 console.log("Event updated successfully");
+                addToast("Event updated successfully", "success");
             } else {
                 const newEvent = await createCalendarEvent(eventPayload);
                 console.log("Event created successfully:", newEvent);
+                addToast("Event created successfully", "success");
             }
             await loadEvents(); // Refresh list
         } catch (error) {
             console.error("Failed to save event:", error);
-            alert("Error saving event. Please try again.");
+            addToast("Failed to save event. Please try again.", "error");
+        } finally {
+            isLoading.set(false);
         }
 
         isEventModalOpen = false;
@@ -149,13 +159,17 @@
         if (!editEventId) return;
 
         if (confirm("Are you sure you want to delete this event?")) {
+            isLoading.set(true);
             try {
                 await deleteCalendarEvent(editEventId);
                 console.log("Event deleted successfully");
+                addToast("Event deleted successfully", "success");
                 await loadEvents(); // Refresh list
             } catch (error) {
                 console.error("Failed to delete event:", error);
-                alert("Error deleting event. Please try again.");
+                addToast("Failed to delete event. Please try again.", "error");
+            } finally {
+                isLoading.set(false);
             }
         }
         isEventModalOpen = false;
@@ -171,6 +185,7 @@
     ): Promise<void> {
         const { id, startAt, endAt, eventData } = event.detail;
         console.log(`Moving event ${id} to ${startAt} - ${endAt}`);
+        isLoading.set(true);
 
         try {
             await updateCalendarEvent(id, {
@@ -179,10 +194,13 @@
                 endAt,
             });
             console.log("Event moved successfully");
+            addToast("Event moved successfully", "success");
             await loadEvents(); // Refresh list
         } catch (error) {
             console.error("Failed to move event:", error);
-            alert("Error moving event. Please try again.");
+            addToast("Failed to move event. Please try again.", "error");
+        } finally {
+            isLoading.set(false);
         }
     }
 

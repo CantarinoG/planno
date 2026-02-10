@@ -41,11 +41,25 @@
         }
     }
 
+    let dragOverDayIndex: number | null = null;
+    let dragOverTime: string | null = null;
+
     function handleDragOver(e: DragEvent, dayIndex: number): void {
         e.preventDefault();
         if (e.dataTransfer) {
             e.dataTransfer.dropEffect = "move";
         }
+
+        // Calculate time slot for visual feedback
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        const y = e.clientY - rect.top;
+        const quarters = Math.round(y / (HOUR_HEIGHT / 4));
+        const totalMinutes = quarters * 15;
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+
+        dragOverDayIndex = dayIndex;
+        dragOverTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 
         // Week navigation sensors
         if (dayIndex === 0 && !navTimeout) {
@@ -65,10 +79,14 @@
 
     function handleDragLeave(): void {
         clearNavTimeout();
+        dragOverDayIndex = null;
+        dragOverTime = null;
     }
 
     function handleDrop(e: DragEvent, dayIndex: number): void {
         e.preventDefault();
+        dragOverDayIndex = null;
+        dragOverTime = null;
         const data = e.dataTransfer?.getData("application/json");
         if (!data) return;
 
@@ -315,11 +333,13 @@
                     {#each Array(7) as _, i}
                         <div
                             role="button"
-                            aria-label="Create event in day column"
+                            aria-label={`Day column for ${format(addDays(weekStart, i), "EEEE, MMMM do")}`}
                             tabindex="0"
                             class="border-r border-base-300 last:border-r-0 relative cursor-pointer {i ===
                             0
                                 ? 'bg-blue-50/10'
+                                : ''} {dragOverDayIndex === i
+                                ? 'bg-blue-50/30'
                                 : ''}"
                             onclick={(e) => handleCellClick(i, e)}
                             ondragover={(e) => handleDragOver(e, i)}

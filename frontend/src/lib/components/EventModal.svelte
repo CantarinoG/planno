@@ -101,7 +101,27 @@
             close();
         }
     }
+
+    function handleKeydown(e: KeyboardEvent): void {
+        if (e.key === "Escape") {
+            close();
+        }
+    }
+
+    let modalElement: HTMLElement;
+
+    $: if (isOpen && modalElement) {
+        // Focus the first input when modal opens
+        setTimeout(() => {
+            const firstInput = modalElement.querySelector(
+                "input",
+            ) as HTMLElement;
+            if (firstInput) firstInput.focus();
+        }, 50);
+    }
 </script>
+
+<svelte:window on:keydown={handleKeydown} />
 
 {#if isOpen}
     <div
@@ -109,13 +129,16 @@
         on:mousedown={handleBackdropClick}
         role="dialog"
         aria-modal="true"
+        aria-labelledby="modal-title"
         tabindex="-1"
+        bind:this={modalElement}
     >
         <div
             class="modal-box w-full max-w-lg p-0 bg-base-100 rounded-3xl shadow-2xl border border-base-300 overflow-hidden"
         >
             <div class="flex items-center justify-between px-8 py-6">
                 <h2
+                    id="modal-title"
                     class="text-xs font-bold text-base-content/40 tracking-widest uppercase"
                 >
                     {isEdit ? "Update Event" : "Create New Event"}
