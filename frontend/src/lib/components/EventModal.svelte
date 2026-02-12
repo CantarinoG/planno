@@ -446,7 +446,12 @@
                     <button
                         class="btn bg-blue-600 hover:bg-blue-700 disabled:bg-base-300 disabled:text-base-content/30 text-white border-none font-bold px-8 shadow-lg shadow-blue-500/20"
                         on:click={save}
-                        disabled={!!timeError || !title}
+                        disabled={!!timeError ||
+                            !title.trim() ||
+                            !eventDate ||
+                            !startTime ||
+                            !endTime ||
+                            !selectedColorId}
                     >
                         {isEdit ? "Update Event" : "Save Event"}
                     </button>

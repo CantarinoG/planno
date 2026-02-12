@@ -58,6 +58,21 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<CalendarEvent>> Post([FromBody] CalendarEvent calendarEvent)
         {
+            if (string.IsNullOrWhiteSpace(calendarEvent.Title))
+            {
+                return BadRequest("Title is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(calendarEvent.Color))
+            {
+                return BadRequest("Color is required.");
+            }
+
+            if (calendarEvent.StartAt == default || calendarEvent.EndAt == default)
+            {
+                return BadRequest("Start and end dates are required.");
+            }
+
             if (calendarEvent.EndAt <= calendarEvent.StartAt)
             {
                 return BadRequest("Event must end after it starts.");
@@ -70,6 +85,21 @@ namespace Backend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(string id, [FromBody] CalendarEvent updatedEvent)
         {
+            if (string.IsNullOrWhiteSpace(updatedEvent.Title))
+            {
+                return BadRequest("Title is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(updatedEvent.Color))
+            {
+                return BadRequest("Color is required.");
+            }
+
+            if (updatedEvent.StartAt == default || updatedEvent.EndAt == default)
+            {
+                return BadRequest("Start and end dates are required.");
+            }
+
             if (updatedEvent.EndAt <= updatedEvent.StartAt)
             {
                 return BadRequest("Event must end after it starts.");
