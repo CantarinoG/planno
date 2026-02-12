@@ -27,8 +27,9 @@
     }>();
 
     let title: string = "";
-    let startDate: string = "";
-    let endDate: string = "";
+    let eventDate: string = "";
+    let startTime: string = "";
+    let endTime: string = "";
     let description: string = "";
     let selectedColorId: string = DEFAULT_COLOR_ID;
     let isEdit: boolean = false;
@@ -40,13 +41,15 @@
             title = initialTitle;
             description = initialDescription;
             selectedColorId = initialColorId;
-            startDate = date;
-            endDate =
-                initialEndDate ||
-                format(
-                    new Date(new Date(date).getTime() + 3600000),
-                    "yyyy-MM-dd'T'HH:mm",
-                );
+
+            const start: Date = new Date(date);
+            eventDate = format(start, "yyyy-MM-dd");
+            startTime = format(start, "HH:mm");
+
+            const end: Date = initialEndDate
+                ? new Date(initialEndDate)
+                : new Date(start.getTime() + 3600000);
+            endTime = format(end, "HH:mm");
         } else if (date) {
             // Create mode initialization
             title = "";
@@ -64,8 +67,9 @@
             const end: Date = new Date(start);
             end.setHours(start.getHours() + 1);
 
-            startDate = format(start, "yyyy-MM-dd'T'HH:mm");
-            endDate = format(end, "yyyy-MM-dd'T'HH:mm");
+            eventDate = format(start, "yyyy-MM-dd");
+            startTime = format(start, "HH:mm");
+            endTime = format(end, "HH:mm");
         }
     }
 
@@ -74,10 +78,13 @@
     }
 
     function save(): void {
+        const startISO = `${eventDate}T${startTime}`;
+        const endISO = `${eventDate}T${endTime}`;
+
         dispatch("save", {
             title,
-            startDate,
-            endDate,
+            startDate: startISO,
+            endDate: endISO,
             description,
             color: selectedColorId,
         });
@@ -169,12 +176,12 @@
                     />
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-6">
                     <div class="space-y-2">
                         <label
-                            for="start-date"
+                            for="event-date"
                             class="text-[10px] font-bold text-base-content/40 tracking-widest uppercase px-1"
-                            >Start At</label
+                            >Date</label
                         >
                         <div class="relative group">
                             <div
@@ -211,61 +218,93 @@
                                 >
                             </div>
                             <input
-                                id="start-date"
-                                type="datetime-local"
-                                bind:value={startDate}
+                                id="event-date"
+                                type="date"
+                                bind:value={eventDate}
                                 on:click={(e) => e.currentTarget.showPicker()}
                                 class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-blue-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm appearance-none"
                             />
                         </div>
                     </div>
-                    <div class="space-y-2">
-                        <label
-                            for="end-date"
-                            class="text-[10px] font-bold text-base-content/40 tracking-widest uppercase px-1"
-                            >End At</label
-                        >
-                        <div class="relative group">
-                            <div
-                                class="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30 group-focus-within:text-blue-500 transition-colors"
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label
+                                for="start-time"
+                                class="text-[10px] font-bold text-base-content/40 tracking-widest uppercase px-1"
+                                >Start Time</label
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    ><rect
-                                        x="3"
-                                        y="4"
+                            <div class="relative group">
+                                <div
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30 group-focus-within:text-blue-500 transition-colors"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
                                         width="18"
                                         height="18"
-                                        rx="2"
-                                        ry="2"
-                                    /><line
-                                        x1="16"
-                                        y1="2"
-                                        x2="16"
-                                        y2="6"
-                                    /><line x1="8" y1="2" x2="8" y2="6" /><line
-                                        x1="3"
-                                        y1="10"
-                                        x2="21"
-                                        y2="10"
-                                    /></svg
-                                >
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        ><circle
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                        /><polyline
+                                            points="12 6 12 12 16 14"
+                                        /></svg
+                                    >
+                                </div>
+                                <input
+                                    id="start-time"
+                                    type="time"
+                                    bind:value={startTime}
+                                    on:click={(e) =>
+                                        e.currentTarget.showPicker()}
+                                    class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-blue-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm appearance-none"
+                                />
                             </div>
-                            <input
-                                id="end-date"
-                                type="datetime-local"
-                                bind:value={endDate}
-                                on:click={(e) => e.currentTarget.showPicker()}
-                                class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-blue-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm appearance-none"
-                            />
+                        </div>
+                        <div class="space-y-2">
+                            <label
+                                for="end-time"
+                                class="text-[10px] font-bold text-base-content/40 tracking-widest uppercase px-1"
+                                >End Time</label
+                            >
+                            <div class="relative group">
+                                <div
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30 group-focus-within:text-blue-500 transition-colors"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        ><circle
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                        /><polyline
+                                            points="12 6 12 12 16 14"
+                                        /></svg
+                                    >
+                                </div>
+                                <input
+                                    id="end-time"
+                                    type="time"
+                                    bind:value={endTime}
+                                    on:click={(e) =>
+                                        e.currentTarget.showPicker()}
+                                    class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-blue-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm appearance-none"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
