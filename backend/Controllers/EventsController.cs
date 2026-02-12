@@ -58,6 +58,11 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<CalendarEvent>> Post([FromBody] CalendarEvent calendarEvent)
         {
+            if (calendarEvent.EndAt <= calendarEvent.StartAt)
+            {
+                return BadRequest("Event must end after it starts.");
+            }
+
             await _events.InsertOneAsync(calendarEvent);
             return CreatedAtAction(nameof(GetById), new { id = calendarEvent.Id }, calendarEvent);
         }
@@ -65,6 +70,11 @@ namespace Backend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(string id, [FromBody] CalendarEvent updatedEvent)
         {
+            if (updatedEvent.EndAt <= updatedEvent.StartAt)
+            {
+                return BadRequest("Event must end after it starts.");
+            }
+
             var eventFound = await _events.Find(e => e.Id == id).FirstOrDefaultAsync();
 
             if (eventFound == null)

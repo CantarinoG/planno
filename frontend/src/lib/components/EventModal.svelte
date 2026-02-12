@@ -33,6 +33,15 @@
     let description: string = "";
     let selectedColorId: string = DEFAULT_COLOR_ID;
     let isEdit: boolean = false;
+    let timeError: string = "";
+
+    $: {
+        if (startTime && endTime && startTime >= endTime) {
+            timeError = "End time must be after start time";
+        } else {
+            timeError = "";
+        }
+    }
 
     $: if (isOpen) {
         isEdit = !!(initialTitle || initialDescription || initialEndDate);
@@ -78,6 +87,8 @@
     }
 
     function save(): void {
+        if (timeError) return;
+
         const startISO = `${eventDate}T${startTime}`;
         const endISO = `${eventDate}T${endTime}`;
 
@@ -307,6 +318,36 @@
                             </div>
                         </div>
                     </div>
+
+                    {#if timeError}
+                        <div
+                            class="px-1 text-xs font-bold text-error animate-pulse flex items-center gap-1.5"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="3"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                ><circle cx="12" cy="12" r="10" /><line
+                                    x1="12"
+                                    y1="8"
+                                    x2="12"
+                                    y2="12"
+                                /><line
+                                    x1="12"
+                                    y1="16"
+                                    x2="12.01"
+                                    y2="16"
+                                /></svg
+                            >
+                            {timeError}
+                        </div>
+                    {/if}
                 </div>
 
                 <div class="space-y-2">
@@ -403,8 +444,9 @@
                         on:click={close}>Cancel</button
                     >
                     <button
-                        class="btn bg-blue-600 hover:bg-blue-700 text-white border-none font-bold px-8 shadow-lg shadow-blue-500/20"
+                        class="btn bg-blue-600 hover:bg-blue-700 disabled:bg-base-300 disabled:text-base-content/30 text-white border-none font-bold px-8 shadow-lg shadow-blue-500/20"
                         on:click={save}
+                        disabled={!!timeError || !title}
                     >
                         {isEdit ? "Update Event" : "Save Event"}
                     </button>
@@ -416,7 +458,8 @@
 {/if}
 
 <style>
-    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
         position: absolute;
         right: 1rem;
         cursor: pointer;
