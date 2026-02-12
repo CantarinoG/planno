@@ -42,6 +42,43 @@
         <MiniCalendar value={date} on:datechange />
     </div>
 
+    <div class="px-4 pb-4">
+        <div
+            class="bg-base-200/50 rounded-xl p-3 flex flex-col gap-2 border border-base-300"
+        >
+            <h3
+                class="text-[10px] font-bold uppercase tracking-wider text-base-content/40 px-1"
+            >
+                Shortcuts
+            </h3>
+            <div class="flex flex-col gap-1.5">
+                <div class="flex items-center justify-between group">
+                    <span class="text-xs text-base-content/70"
+                        >Navigate weeks</span
+                    >
+                    <div class="flex gap-1">
+                        <kbd class="kbd kbd-xs bg-base-100 border-base-300"
+                            >←</kbd
+                        >
+                        <kbd class="kbd kbd-xs bg-base-100 border-base-300"
+                            >→</kbd
+                        >
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-base-content/70"
+                        >Create event</span
+                    >
+                    <kbd class="kbd kbd-xs bg-base-100 border-base-300">c</kbd>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-base-content/70">Today</span>
+                    <kbd class="kbd kbd-xs bg-base-100 border-base-300">t</kbd>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="p-4 border-t border-base-200">
         <p class="text-xs text-base-content/60 text-center">
             Made by <a
