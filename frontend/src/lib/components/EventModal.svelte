@@ -149,7 +149,7 @@
                         >
                         <div class="relative group">
                             <div
-                                class="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30 group-focus-within:text-blue-500 transition-colors"
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30 group-focus-within:text-orange-500 transition-colors"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -186,7 +186,7 @@
                                 type="date"
                                 bind:value={form.eventDate}
                                 onclick={(e) => e.currentTarget.showPicker()}
-                                class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-blue-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm appearance-none"
+                                class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm appearance-none"
                             />
                         </div>
                     </div>
@@ -200,7 +200,7 @@
                             >
                             <div class="relative group">
                                 <div
-                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30 group-focus-within:text-blue-500 transition-colors"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30 group-focus-within:text-orange-500 transition-colors"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -227,7 +227,7 @@
                                     bind:value={form.startTime}
                                     onclick={(e) =>
                                         e.currentTarget.showPicker()}
-                                    class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-blue-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm appearance-none"
+                                    class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm appearance-none"
                                 />
                             </div>
                         </div>
@@ -239,7 +239,7 @@
                             >
                             <div class="relative group">
                                 <div
-                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30 group-focus-within:text-blue-500 transition-colors"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/30 group-focus-within:text-orange-500 transition-colors"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -266,7 +266,7 @@
                                     bind:value={form.endTime}
                                     onclick={(e) =>
                                         e.currentTarget.showPicker()}
-                                    class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-blue-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm appearance-none"
+                                    class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm appearance-none"
                                 />
                             </div>
                         </div>
@@ -313,7 +313,7 @@
                         id="event-description"
                         bind:value={form.description}
                         placeholder="Add notes, location, or video call links..."
-                        class="w-full p-4 bg-base-200/30 border border-base-300 rounded-xl focus:border-blue-500 focus:bg-base-100 transition-all outline-none min-h-[120px] resize-none text-base-content/80 placeholder:text-base-content/30"
+                        class="w-full p-4 bg-base-200/30 border border-base-300 rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none min-h-[120px] resize-none text-base-content/80 placeholder:text-base-content/30"
                     ></textarea>
                 </div>
 
@@ -328,7 +328,7 @@
                                 class="relative w-8 h-8 rounded-full border-2 transition-all hover:scale-110 active:scale-95"
                                 style="background-color: {color.hex}; border-color: {form.selectedColorId ===
                                 color.id
-                                    ? '#3b82f6'
+                                    ? '#ea580c'
                                     : 'transparent'}"
                                 onclick={() =>
                                     (form.selectedColorId = color.id)}
@@ -398,7 +398,7 @@
                         onclick={close}>Cancel</button
                     >
                     <button
-                        class="btn bg-blue-600 hover:bg-blue-700 disabled:bg-base-300 disabled:text-base-content/30 text-white border-none font-bold px-8 shadow-lg shadow-blue-500/20"
+                        class="btn bg-orange-600 hover:bg-orange-700 disabled:bg-base-300 disabled:text-base-content/30 text-white border-none font-bold px-8 shadow-lg shadow-orange-500/20"
                         onclick={save}
                         disabled={!form.isValid}
                     >

@@ -15,7 +15,7 @@
                 ? 'bg-gradient-to-r from-green-600 to-green-500'
                 : toast.type === 'error'
                   ? 'bg-gradient-to-r from-red-600 to-red-500'
-                  : 'bg-gradient-to-r from-blue-600 to-blue-500'}"
+                  : 'bg-gradient-to-r from-orange-600 to-orange-500'}"
         >
             <div class="flex items-center gap-3">
                 {#if toast.type === "success"}

@@ -12,7 +12,7 @@
 >
     <div class="p-4 pt-6">
         <button
-            class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold w-full rounded-2xl shadow-lg border-none flex items-center justify-center gap-2 py-4 h-auto transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            class="btn bg-orange-600 hover:bg-orange-700 text-white font-bold w-full rounded-2xl shadow-lg border-none flex items-center justify-center gap-2 py-4 h-auto transition-transform hover:scale-[1.02] active:scale-[0.98]"
             onclick={() => dispatch("create")}
         >
             <svg
@@ -85,7 +85,8 @@
                 href="https://github.com/CantarinoG"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="link link-hover text-blue-500 font-medium">@CantarinoG</a
+                class="link link-hover text-orange-500 font-medium"
+                >@CantarinoG</a
             >
         </p>
     </div>

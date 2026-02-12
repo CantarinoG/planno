@@ -17,7 +17,7 @@ builder.Services.AddScoped(sp =>
 {
     var client = sp.GetRequiredService<IMongoClient>();
     var settings = builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
-    return client.GetDatabase(settings?.DatabaseName ?? "Planno");
+    return client.GetDatabase(settings?.DatabaseName ?? "LetsPlan");
 });
 
 builder.Services.AddScoped<IEventsService, EventsService>();

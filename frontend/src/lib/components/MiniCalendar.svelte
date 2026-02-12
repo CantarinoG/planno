@@ -84,7 +84,7 @@
 
 <style>
     .calendar-wrapper :global(.cally) {
-        --p: 53.6% 0.201 267.4; /* OKLCH value for blue-600 approx */
+        --p: 64.5% 0.205 48.3; /* OKLCH value for orange-600 approx */
         --r: 0.5rem;
         font-size: 0.8rem;
     }

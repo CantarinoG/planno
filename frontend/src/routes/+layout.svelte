@@ -8,13 +8,13 @@
 </script>
 
 <svelte:head>
-	<title>Planno</title>
+	<title>LetsPlan</title>
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
 {#if $isLoading}
-	<div class="fixed top-0 left-0 w-full h-1 bg-blue-100 z-[1000]">
-		<div class="h-full bg-blue-600 animate-progress origin-left"></div>
+	<div class="fixed top-0 left-0 w-full h-1 bg-orange-100 z-[1000]">
+		<div class="h-full bg-orange-600 animate-progress origin-left"></div>
 	</div>
 {/if}
 

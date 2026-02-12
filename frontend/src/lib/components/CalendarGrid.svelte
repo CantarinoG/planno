@@ -336,9 +336,9 @@
                             tabindex="0"
                             class="border-r border-base-300 last:border-r-0 relative cursor-pointer {i ===
                             0
-                                ? 'bg-blue-50/10'
+                                ? 'bg-orange-50/10'
                                 : ''} {dragOverDayIndex === i
-                                ? 'bg-blue-50/30'
+                                ? 'bg-orange-50/30'
                                 : ''}"
                             onclick={(e) => handleCellClick(i, e)}
                             ondragover={(e) => handleDragOver(e, i)}

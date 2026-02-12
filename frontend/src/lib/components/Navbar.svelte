@@ -29,7 +29,7 @@
 
         <div class="flex items-center gap-2 sm:gap-6">
             <a href="/" class="flex items-center gap-2 px-1">
-                <div class="bg-blue-600 p-1.5 rounded-lg shadow-sm">
+                <div class="bg-orange-600 p-1.5 rounded-lg shadow-sm">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="h-5 w-5 text-primary-content"
@@ -51,7 +51,7 @@
                 </div>
                 <span
                     class="text-xl font-bold tracking-tight text-base-content hidden sm:inline"
-                    >Planno</span
+                    >LetsPlan</span
                 >
             </a>
 

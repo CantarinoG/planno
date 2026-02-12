@@ -31,19 +31,19 @@
     {#each weekDays as day}
         <div
             class="flex flex-col items-center justify-center py-3 border-r border-base-300 last:border-r-0 {day.isToday
-                ? 'bg-blue-50/30'
+                ? 'bg-orange-50/30'
                 : ''}"
         >
             <span
                 class="text-xs font-bold mb-1 {day.isToday
-                    ? 'text-blue-600'
+                    ? 'text-orange-600'
                     : 'text-base-content/50'}"
             >
                 {day.name}
             </span>
             <div
                 class="{day.isToday
-                    ? 'bg-blue-600 text-white shadow-md'
+                    ? 'bg-orange-600 text-white shadow-md'
                     : 'text-base-content'} w-10 h-10 rounded-full flex items-center justify-center text-xl font-medium transition-all"
             >
                 {day.number}

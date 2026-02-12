@@ -56,7 +56,7 @@
                         ? 'bg-red-600 hover:bg-red-700 shadow-red-500/20'
                         : type === 'warning'
                           ? 'bg-yellow-500 hover:bg-yellow-600 shadow-yellow-500/20'
-                          : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20'}"
+                          : 'bg-orange-600 hover:bg-orange-700 shadow-orange-500/20'}"
                     on:click={handleConfirm}
                 >
                     {confirmText}
