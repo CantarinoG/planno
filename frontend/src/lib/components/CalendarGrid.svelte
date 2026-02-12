@@ -293,11 +293,11 @@
 <div
     class="flex-1 flex flex-col overflow-x-auto bg-base-100 scrollbar-gutter-stable"
 >
-    <div class="min-w-[700px] flex-1 flex flex-col">
+    <div class="min-w-0 lg:min-w-[700px] flex-1 flex flex-col">
         <div class="flex border-b border-base-300">
             <!-- Spacer for TimeGutter alignment -->
             <div
-                class="w-16 lg:w-20 border-r border-base-300 bg-base-100 flex-shrink-0"
+                class="w-12 lg:w-20 border-r border-base-300 bg-base-100 flex-shrink-0"
             ></div>
 
             <div class="flex-1">
@@ -310,7 +310,7 @@
             <div class="flex">
                 <!-- Time Gutter -->
                 <div
-                    class="w-16 lg:w-20 border-r border-base-300 flex flex-col items-center text-xs font-medium text-base-content/50 bg-base-100 flex-shrink-0"
+                    class="w-12 lg:w-20 border-r border-base-300 flex flex-col items-center text-xs font-medium text-base-content/50 bg-base-100 flex-shrink-0"
                 >
                     {#each Array(24) as _, i}
                         <div class="h-20 relative w-full text-center">

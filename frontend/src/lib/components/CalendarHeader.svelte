@@ -44,7 +44,7 @@
             <div
                 class="{day.isToday
                     ? 'bg-orange-600 text-white shadow-md'
-                    : 'text-base-content'} w-10 h-10 rounded-full flex items-center justify-center text-xl font-medium transition-all"
+                    : 'text-base-content'} w-7 h-7 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-xl font-medium transition-all"
             >
                 {day.number}
             </div>

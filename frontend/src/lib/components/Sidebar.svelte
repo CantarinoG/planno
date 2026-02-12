@@ -42,7 +42,7 @@
         <MiniCalendar value={date} on:datechange />
     </div>
 
-    <div class="px-4 pb-4">
+    <div class="hidden lg:block px-4 pb-4">
         <div
             class="bg-base-200/50 rounded-xl p-3 flex flex-col gap-2 border border-base-300"
         >
