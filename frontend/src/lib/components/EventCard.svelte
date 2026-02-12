@@ -7,7 +7,6 @@
     export let endTime: string = "10:00";
     export let color: string = "blue";
     export let description: string = "";
-    export let isAllDay: boolean = false;
     export let top: number = 0; // Position in pixels from top
     export let height: number = 80; // Height in pixels
     export let column: number = 0; // Which column this event is in (for overlapping events)
@@ -28,7 +27,6 @@
             endAt: string;
             color: string;
             description: string;
-            isAllDay: boolean;
         };
     }>();
 
@@ -43,7 +41,6 @@
             endAt,
             color,
             description,
-            isAllDay,
         });
     }
 
@@ -56,7 +53,6 @@
                     title,
                     description,
                     color,
-                    isAllDay,
                     durationMinutes: calculateDurationMinutes(
                         startTime,
                         endTime,

@@ -39,7 +39,6 @@
     let editDescription: string = "";
     let editColorId: string = DEFAULT_COLOR_ID;
     let editEndDate: string = "";
-    let editIsAllDay: boolean = false;
 
     async function loadEvents(): Promise<void> {
         isLoading.set(true);
@@ -64,7 +63,7 @@
         editDescription = "";
         editColorId = DEFAULT_COLOR_ID;
         editEndDate = "";
-        editIsAllDay = false;
+        editEndDate = "";
         isEventModalOpen = true;
     }
 
@@ -75,7 +74,7 @@
         editDescription = "";
         editColorId = DEFAULT_COLOR_ID;
         editEndDate = "";
-        editIsAllDay = false;
+        editEndDate = "";
         isEventModalOpen = true;
     }
 
@@ -89,7 +88,6 @@
         editTitle = detail.title;
         editDescription = detail.description || "";
         editColorId = detail.color;
-        editIsAllDay = detail.isAllDay || false;
         editEndDate = detail.endAt;
 
         isEventModalOpen = true;
@@ -118,7 +116,6 @@
     async function saveEvent(
         e: CustomEvent<{
             title: string;
-            isAllDay: boolean;
             startDate: string;
             endDate: string;
             description: string;
@@ -136,7 +133,6 @@
                 startAt: new Date(detail.startDate).toISOString(),
                 endAt: new Date(detail.endDate).toISOString(),
                 color: detail.color,
-                isAllDay: detail.isAllDay,
             };
 
             if (editEventId) {
@@ -326,7 +322,6 @@
         initialDescription={editDescription}
         initialColorId={editColorId}
         initialEndDate={editEndDate}
-        initialIsAllDay={editIsAllDay}
         on:close={closeEventModal}
         on:save={saveEvent}
         on:delete={handleDeleteFromModal}

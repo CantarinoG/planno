@@ -175,7 +175,6 @@
         endAt: string; // Full ISO
         color: string;
         description?: string;
-        isAllDay?: boolean;
         dayIndex: number;
         top: number;
         height: number;
@@ -368,7 +367,6 @@
                                     endAt={event.endAt}
                                     color={event.color}
                                     description={event.description || ""}
-                                    isAllDay={event.isAllDay || false}
                                     top={event.top}
                                     height={event.height}
                                     column={event.column ?? 0}

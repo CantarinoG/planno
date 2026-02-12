@@ -7,7 +7,6 @@ export interface CalendarEvent {
     startAt: string; // ISO string
     endAt: string;   // ISO string
     color: string;
-    isAllDay?: boolean;
     createdAt?: string;
     updatedAt?: string;
 }

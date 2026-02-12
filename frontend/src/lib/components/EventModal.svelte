@@ -13,14 +13,12 @@
     export let initialDescription: string = "";
     export let initialColorId: string = DEFAULT_COLOR_ID;
     export let initialEndDate: string = "";
-    export let initialIsAllDay: boolean = false;
 
     const dispatch = createEventDispatcher<{
         close: null;
         delete: null;
         save: {
             title: string;
-            isAllDay: boolean;
             startDate: string;
             endDate: string;
             description: string;
@@ -29,7 +27,6 @@
     }>();
 
     let title: string = "";
-    let isAllDay: boolean = false;
     let startDate: string = "";
     let endDate: string = "";
     let description: string = "";
@@ -43,7 +40,6 @@
             title = initialTitle;
             description = initialDescription;
             selectedColorId = initialColorId;
-            isAllDay = initialIsAllDay;
             startDate = date;
             endDate =
                 initialEndDate ||
@@ -56,7 +52,6 @@
             title = "";
             description = "";
             selectedColorId = DEFAULT_COLOR_ID;
-            isAllDay = false;
 
             const start: Date = new Date(date);
             const hasTime = date.includes("T") && date.length > 10;
@@ -81,7 +76,6 @@
     function save(): void {
         dispatch("save", {
             title,
-            isAllDay,
             startDate,
             endDate,
             description,
@@ -175,40 +169,6 @@
                     />
                 </div>
 
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="p-2 bg-base-200/50 rounded-xl text-base-content/60"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                ><circle cx="12" cy="12" r="10" /><polyline
-                                    points="12 6 12 12 16 14"
-                                /></svg
-                            >
-                        </div>
-                        <label
-                            for="all-day-toggle"
-                            class="font-bold text-base-content/70 cursor-pointer"
-                            >All Day Event</label
-                        >
-                    </div>
-                    <input
-                        id="all-day-toggle"
-                        type="checkbox"
-                        bind:checked={isAllDay}
-                        class="toggle toggle-primary"
-                    />
-                </div>
-
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label
@@ -252,7 +212,7 @@
                             </div>
                             <input
                                 id="start-date"
-                                type={isAllDay ? "date" : "datetime-local"}
+                                type="datetime-local"
                                 bind:value={startDate}
                                 on:click={(e) => e.currentTarget.showPicker()}
                                 class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-blue-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm appearance-none"
@@ -301,7 +261,7 @@
                             </div>
                             <input
                                 id="end-date"
-                                type={isAllDay ? "date" : "datetime-local"}
+                                type="datetime-local"
                                 bind:value={endDate}
                                 on:click={(e) => e.currentTarget.showPicker()}
                                 class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-blue-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm appearance-none"
@@ -417,8 +377,7 @@
 {/if}
 
 <style>
-    input[type="datetime-local"]::-webkit-calendar-picker-indicator,
-    input[type="date"]::-webkit-calendar-picker-indicator {
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
         position: absolute;
         right: 1rem;
         cursor: pointer;
