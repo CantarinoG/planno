@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
 using Backend.Models;
+using Backend.Services;
 
 namespace Backend.Controllers
 {
@@ -8,11 +8,11 @@ namespace Backend.Controllers
     [Route("api/[controller]")]
     public class EventsController : ControllerBase
     {
-        private readonly IMongoCollection<CalendarEvent> _events;
+        private readonly IEventsService _eventsService;
 
-        public EventsController(IMongoDatabase database)
+        public EventsController(IEventsService eventsService)
         {
-            _events = database.GetCollection<CalendarEvent>("Events");
+            _eventsService = eventsService;
         }
 
         [HttpGet]
@@ -20,36 +20,14 @@ namespace Backend.Controllers
             [FromQuery] DateTime? start_date, 
             [FromQuery] DateTime? end_date)
         {
-            var filter = Builders<CalendarEvent>.Filter.Empty;
-
-            if (start_date.HasValue && end_date.HasValue)
-            {
-                var start = DateTime.SpecifyKind(start_date.Value, DateTimeKind.Utc);
-                var end = DateTime.SpecifyKind(end_date.Value, DateTimeKind.Utc);
-                filter = Builders<CalendarEvent>.Filter.And(
-                    Builders<CalendarEvent>.Filter.Gte(e => e.StartAt, start),
-                    Builders<CalendarEvent>.Filter.Lte(e => e.StartAt, end)
-                );
-            }
-            else if (start_date.HasValue)
-            {
-                var start = DateTime.SpecifyKind(start_date.Value, DateTimeKind.Utc);
-                filter = Builders<CalendarEvent>.Filter.Gte(e => e.StartAt, start);
-            }
-            else if (end_date.HasValue)
-            {
-                var end = DateTime.SpecifyKind(end_date.Value, DateTimeKind.Utc);
-                filter = Builders<CalendarEvent>.Filter.Lte(e => e.StartAt, end);
-            }
-
-            var events = await _events.Find(filter).ToListAsync();
+            var events = await _eventsService.GetEventsAsync(start_date, end_date);
             return Ok(events);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<CalendarEvent>> GetById(string id)
         {
-            var eventFound = await _events.Find(e => e.Id == id).FirstOrDefaultAsync();
+            var eventFound = await _eventsService.GetEventByIdAsync(id);
 
             if (eventFound == null)
             {
@@ -62,74 +40,41 @@ namespace Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<CalendarEvent>> Post([FromBody] CalendarEvent calendarEvent)
         {
-            if (string.IsNullOrWhiteSpace(calendarEvent.Title))
+            try
             {
-                return BadRequest("Title is required.");
+                var createdEvent = await _eventsService.CreateEventAsync(calendarEvent);
+                return CreatedAtAction(nameof(GetById), new { id = createdEvent.Id }, createdEvent);
             }
-
-            if (string.IsNullOrWhiteSpace(calendarEvent.Color))
+            catch (ArgumentException ex)
             {
-                return BadRequest("Color is required.");
+                return BadRequest(ex.Message);
             }
-
-            if (calendarEvent.StartAt == default || calendarEvent.EndAt == default)
-            {
-                return BadRequest("Start and end dates are required.");
-            }
-
-            if (calendarEvent.EndAt <= calendarEvent.StartAt)
-            {
-                return BadRequest("Event must end after it starts.");
-            }
-
-            await _events.InsertOneAsync(calendarEvent);
-            return CreatedAtAction(nameof(GetById), new { id = calendarEvent.Id }, calendarEvent);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(string id, [FromBody] CalendarEvent updatedEvent)
         {
-            if (string.IsNullOrWhiteSpace(updatedEvent.Title))
+            try
             {
-                return BadRequest("Title is required.");
+                await _eventsService.UpdateEventAsync(id, updatedEvent);
+                return NoContent();
             }
-
-            if (string.IsNullOrWhiteSpace(updatedEvent.Color))
+            catch (ArgumentException ex)
             {
-                return BadRequest("Color is required.");
+                return BadRequest(ex.Message);
             }
-
-            if (updatedEvent.StartAt == default || updatedEvent.EndAt == default)
-            {
-                return BadRequest("Start and end dates are required.");
-            }
-
-            if (updatedEvent.EndAt <= updatedEvent.StartAt)
-            {
-                return BadRequest("Event must end after it starts.");
-            }
-
-            var eventFound = await _events.Find(e => e.Id == id).FirstOrDefaultAsync();
-
-            if (eventFound == null)
+            catch (KeyNotFoundException)
             {
                 return NotFound();
             }
-
-            updatedEvent.Id = eventFound.Id;
-            updatedEvent.UpdatedAt = DateTime.UtcNow;
-
-            await _events.ReplaceOneAsync(e => e.Id == id, updatedEvent);
-
-            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var result = await _events.DeleteOneAsync(e => e.Id == id);
+            var deleted = await _eventsService.DeleteEventAsync(id);
 
-            if (result.DeletedCount == 0)
+            if (!deleted)
             {
                 return NotFound();
             }

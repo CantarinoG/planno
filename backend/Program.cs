@@ -1,4 +1,5 @@
 using Backend.Configurations;
+using Backend.Services;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,8 @@ builder.Services.AddScoped(sp =>
     var settings = builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
     return client.GetDatabase(settings?.DatabaseName ?? "Planno");
 });
+
+builder.Services.AddScoped<IEventsService, EventsService>();
 
 builder.Services.AddControllers();
 
