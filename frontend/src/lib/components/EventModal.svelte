@@ -65,10 +65,15 @@
             description = "";
             selectedColorId = DEFAULT_COLOR_ID;
 
-            const start: Date = new Date(date);
+            let start: Date;
             const hasTime = date.includes("T") && date.length > 10;
 
-            if (!hasTime) {
+            if (hasTime) {
+                start = new Date(date);
+            } else {
+                // date is "yyyy-MM-dd", parse as local time to avoid off-by-one errors
+                const parts = date.split("-").map(Number);
+                start = new Date(parts[0], parts[1] - 1, parts[2]);
                 const now: Date = new Date();
                 start.setHours(now.getHours(), 0, 0, 0);
             }

@@ -24,18 +24,22 @@ namespace Backend.Controllers
 
             if (start_date.HasValue && end_date.HasValue)
             {
+                var start = DateTime.SpecifyKind(start_date.Value, DateTimeKind.Utc);
+                var end = DateTime.SpecifyKind(end_date.Value, DateTimeKind.Utc);
                 filter = Builders<CalendarEvent>.Filter.And(
-                    Builders<CalendarEvent>.Filter.Gte(e => e.StartAt, start_date.Value),
-                    Builders<CalendarEvent>.Filter.Lte(e => e.StartAt, end_date.Value)
+                    Builders<CalendarEvent>.Filter.Gte(e => e.StartAt, start),
+                    Builders<CalendarEvent>.Filter.Lte(e => e.StartAt, end)
                 );
             }
             else if (start_date.HasValue)
             {
-                filter = Builders<CalendarEvent>.Filter.Gte(e => e.StartAt, start_date.Value);
+                var start = DateTime.SpecifyKind(start_date.Value, DateTimeKind.Utc);
+                filter = Builders<CalendarEvent>.Filter.Gte(e => e.StartAt, start);
             }
             else if (end_date.HasValue)
             {
-                filter = Builders<CalendarEvent>.Filter.Lte(e => e.StartAt, end_date.Value);
+                var end = DateTime.SpecifyKind(end_date.Value, DateTimeKind.Utc);
+                filter = Builders<CalendarEvent>.Filter.Lte(e => e.StartAt, end);
             }
 
             var events = await _events.Find(filter).ToListAsync();
