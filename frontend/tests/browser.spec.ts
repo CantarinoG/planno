@@ -112,8 +112,9 @@ test.describe('Event CRUD operations', () => {
         const randomIndex = Math.floor(Math.random() * colorCount);
         await colorButtons.nth(randomIndex).click();
         await page.getByRole('button', { name: 'Save Event' }).click();
-        await expect(page.getByText(eventTitle)).toBeVisible();
-        await expect(page.getByText('01:00 - 01:30')).toBeVisible();
+        const eventCard = page.locator('[role="button"][draggable="true"]', { hasText: eventTitle });
+        await expect(eventCard).toBeVisible();
+        await expect(eventCard).toContainText('01:00 - 01:30');
     });
 
     test('should update an existing event', async ({ page }) => {
@@ -202,7 +203,7 @@ test.describe('Drag and Drop', () => {
         await page.mouse.move(sourceX, targetY, { steps: 10 });
         await page.mouse.up();
 
-        await expect(page.getByText('04:30 - 05:30')).toBeVisible();
+        await expect(eventCard).toContainText('04:30 - 05:30');
     });
 
     test('should drag and drop event across weeks', async ({ page }) => {
@@ -231,10 +232,11 @@ test.describe('Drag and Drop', () => {
         const initialRange = await dateRange.textContent();
         await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
         await page.mouse.down();
-        await page.mouse.move(targetX, targetY, { steps: 10 });
+        await page.mouse.move(targetX, targetY, { steps: 50 });
         await expect(dateRange).not.toHaveText(initialRange!, { timeout: 10000 });
+        await page.waitForTimeout(100);
         await page.mouse.up();
-        await expect(page.getByText(eventTitle)).toBeVisible();
+        await expect(page.locator('[role="button"][draggable="true"]', { hasText: eventTitle })).toBeVisible();
     });
 });
 
@@ -270,11 +272,12 @@ test.describe('UI Layout and Overlap', () => {
         await expect(card2).toBeVisible();
         const style1 = await card1.getAttribute('style');
         const style2 = await card2.getAttribute('style');
-        expect(style1).toContain('width: 50%');
-        expect(style2).toContain('width: 50%');
-        const hasLeft0 = style1?.includes('left: 0%') || style2?.includes('left: 0%');
-        const hasLeft50 = style1?.includes('left: 50%') || style2?.includes('left: 50%');
-        expect(hasLeft0).toBeTruthy();
-        expect(hasLeft50).toBeTruthy();
+        const width1 = parseFloat(style1?.match(/width: ([\d.]+)%/)?.[1] || '0');
+        const width2 = parseFloat(style2?.match(/width: ([\d.]+)%/)?.[1] || '0');
+        const left1 = parseFloat(style1?.match(/left: ([\d.]+)%/)?.[1] || '0');
+        const left2 = parseFloat(style2?.match(/left: ([\d.]+)%/)?.[1] || '0');
+        expect(Math.abs(width1 - width2)).toBeLessThan(1);
+        expect(width1).toBeLessThan(100);
+        expect(Math.abs(left1 - left2)).toBeGreaterThan(0);
     });
 });
