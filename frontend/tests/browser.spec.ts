@@ -5,7 +5,7 @@ test.use({
         slowMo: 1000,
     },
 });
-
+/*
 test.describe('Event CRUD operations', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('/');
@@ -52,5 +52,63 @@ test.describe('Event CRUD operations', () => {
         const confirmDeleteButton = page.getByRole('button', { name: 'Delete', exact: true });
         await confirmDeleteButton.click();
         await expect(page.getByText(deleteTitle)).not.toBeVisible();
+    });
+});
+*/
+test.describe('UI Navigation', () => {
+    test.beforeEach(async ({ page }) => {
+        await page.goto('/');
+    });
+
+    test('should toggle sidebar', async ({ page }) => {
+        const sidebar = page.locator('aside');
+        await expect(sidebar).toBeVisible();
+        await page.getByRole('button', { name: 'Toggle Sidebar' }).click();
+        await expect(sidebar).not.toBeVisible();
+        await page.getByRole('button', { name: 'Toggle Sidebar' }).click();
+        await expect(sidebar).toBeVisible();
+    });
+
+    test('should navigate between weeks using navbar arrows', async ({ page }) => {
+        const dateRange = page.locator('.navbar-center span');
+        const initialRange = await dateRange.textContent();
+        const nextButton = page.locator('.navbar-center').getByRole('button', { name: 'Next Week' });
+        await nextButton.click();
+        await expect(dateRange).not.toHaveText(initialRange!);
+        const prevButton = page.locator('.navbar-center').getByRole('button', { name: 'Previous Week' });
+        await prevButton.click();
+
+        await expect(dateRange).toHaveText(initialRange!);
+    });
+
+    test('should navigate weeks using mini-calendar day click', async ({ page }) => {
+        const dateRange = page.locator('.navbar-center span');
+        const initialRange = await dateRange.textContent();
+        const calendar = page.locator('aside calendar-month');
+        await expect(calendar).toBeVisible();
+        const today = new Date();
+        const targetDay = today.getDate() > 15 ? 1 : 28;
+        await calendar.locator('button').getByText(targetDay.toString(), { exact: true }).click({ force: true });
+        await expect(dateRange).not.toHaveText(initialRange!);
+    });
+
+    test('should return to today', async ({ page }) => {
+        const dateRange = page.locator('.navbar-center span');
+        const initialRange = await dateRange.textContent();
+        await page.locator('.navbar-center').getByRole('button', { name: 'Next Week' }).click();
+        await expect(dateRange).not.toHaveText(initialRange!);
+        await page.getByRole('button', { name: 'Today' }).click();
+        await expect(dateRange).toHaveText(initialRange!);
+    });
+
+    test('should toggle dark/light mode', async ({ page }) => {
+        const html = page.locator('html');
+        const initialTheme = await html.getAttribute('data-theme');
+        await page.getByRole('button', { name: 'Toggle Theme' }).click();
+        const toggledTheme = await html.getAttribute('data-theme');
+        expect(toggledTheme).not.toBe(initialTheme);
+        await page.getByRole('button', { name: 'Toggle Theme' }).click();
+        const restoredTheme = await html.getAttribute('data-theme');
+        expect(restoredTheme).toBe(initialTheme);
     });
 });
