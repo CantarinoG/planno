@@ -197,15 +197,13 @@ test.describe('Drag and Drop', () => {
         const sourceX = box.x + box.width / 2;
         const sourceY = box.y + box.height / 2;
         const targetY = sourceY + 160;
-
         await page.mouse.move(sourceX, sourceY);
         await page.mouse.down();
         await page.mouse.move(sourceX, targetY, { steps: 10 });
         await page.mouse.up();
-
         await expect(eventCard).toContainText('04:30 - 05:30');
     });
-
+    
     test('should drag and drop event across weeks', async ({ page }) => {
         const eventTitle = `Drag Me Cross Week ${Date.now()}`;
         await page.getByRole('button', { name: 'Create Event' }).click();
@@ -222,18 +220,28 @@ test.describe('Drag and Drop', () => {
         await expect(eventCard).toBeVisible();
         const box = await eventCard.boundingBox();
         if (!box) throw new Error('Event card not found');
+        const dateRange = page.locator('.navbar-center span');
+        const initialRange = await dateRange.textContent();
         const dayColumns = page.locator('[role="button"][aria-label^="Day column for"]');
         const lastColumn = dayColumns.nth(6);
         const lastColumnBox = await lastColumn.boundingBox();
         if (!lastColumnBox) throw new Error('Last column not found');
-        const targetX = lastColumnBox.x + lastColumnBox.width / 2;
-        const targetY = box.y + box.height / 2;
-        const dateRange = page.locator('.navbar-center span');
-        const initialRange = await dateRange.textContent();
-        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        const sourceX = box.x + box.width / 2;
+        const sourceY = box.y + box.height / 2;
+        await page.mouse.move(sourceX, sourceY);
         await page.mouse.down();
+        const targetX = lastColumnBox.x + lastColumnBox.width / 2;
+        const targetY = lastColumnBox.y + 200;
         await page.mouse.move(targetX, targetY, { steps: 50 });
-        await expect(dateRange).not.toHaveText(initialRange!, { timeout: 10000 });
+        await page.waitForTimeout(1200);
+        await expect(dateRange).not.toHaveText(initialRange!, { timeout: 2000 });
+        const newDayColumns = page.locator('[role="button"][aria-label^="Day column for"]');
+        const newLastColumn = newDayColumns.nth(6);
+        const newLastColumnBox = await newLastColumn.boundingBox();
+        if (!newLastColumnBox) throw new Error('New last column not found');
+        let dropX = newLastColumnBox.x + newLastColumnBox.width / 2;
+        let dropY = newLastColumnBox.y + 100;
+        await page.mouse.move(dropX, dropY, { steps: 20 });
         await page.waitForTimeout(100);
         await page.mouse.up();
         await expect(page.locator('[role="button"][draggable="true"]', { hasText: eventTitle })).toBeVisible();
