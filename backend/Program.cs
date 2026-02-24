@@ -21,6 +21,7 @@ builder.Services.AddScoped(sp =>
 });
 
 builder.Services.AddScoped<IEventsService, EventsService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddControllers();
 
