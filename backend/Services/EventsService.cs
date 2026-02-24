@@ -12,15 +12,16 @@ namespace Backend.Services
             _events = database.GetCollection<CalendarEvent>("Events");
         }
 
-        public async Task<List<CalendarEvent>> GetEventsAsync(DateTime? startDate, DateTime? endDate)
+        public async Task<List<CalendarEvent>> GetEventsAsync(string userId, DateTime? startDate, DateTime? endDate)
         {
-            FilterDefinition<CalendarEvent> filter = Builders<CalendarEvent>.Filter.Empty;
+            FilterDefinition<CalendarEvent> filter = Builders<CalendarEvent>.Filter.Eq(e => e.UserId, userId);
 
             if (startDate.HasValue && endDate.HasValue)
             {
                 var start = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
                 var end = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
                 filter = Builders<CalendarEvent>.Filter.And(
+                    filter,
                     Builders<CalendarEvent>.Filter.Gte(e => e.StartAt, start),
                     Builders<CalendarEvent>.Filter.Lte(e => e.StartAt, end)
                 );
@@ -28,20 +29,20 @@ namespace Backend.Services
             else if (startDate.HasValue)
             {
                 var start = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
-                filter = Builders<CalendarEvent>.Filter.Gte(e => e.StartAt, start);
+                filter = Builders<CalendarEvent>.Filter.And(filter, Builders<CalendarEvent>.Filter.Gte(e => e.StartAt, start));
             }
             else if (endDate.HasValue)
             {
                 var end = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
-                filter = Builders<CalendarEvent>.Filter.Lte(e => e.StartAt, end);
+                filter = Builders<CalendarEvent>.Filter.And(filter, Builders<CalendarEvent>.Filter.Lte(e => e.StartAt, end));
             }
 
             return await _events.Find(filter).ToListAsync();
         }
 
-        public async Task<CalendarEvent?> GetEventByIdAsync(string id)
+        public async Task<CalendarEvent?> GetEventByIdAsync(string id, string userId)
         {
-            return await _events.Find(e => e.Id == id).FirstOrDefaultAsync();
+            return await _events.Find(e => e.Id == id && e.UserId == userId).FirstOrDefaultAsync();
         }
 
         public async Task<CalendarEvent> CreateEventAsync(CalendarEvent calendarEvent)
@@ -52,24 +53,25 @@ namespace Backend.Services
             return calendarEvent;
         }
 
-        public async Task UpdateEventAsync(string id, CalendarEvent updatedEvent)
+        public async Task UpdateEventAsync(string id, string userId, CalendarEvent updatedEvent)
         {
             ValidateEvent(updatedEvent);
 
-            var eventFound = await _events.Find(e => e.Id == id).FirstOrDefaultAsync();
+            var eventFound = await _events.Find(e => e.Id == id && e.UserId == userId).FirstOrDefaultAsync();
             if (eventFound == null)
             {
                 throw new KeyNotFoundException("Event not found.");
             }
 
             updatedEvent.Id = id;
+            updatedEvent.UserId = userId;
             updatedEvent.UpdatedAt = DateTime.UtcNow;
-            await _events.ReplaceOneAsync(e => e.Id == id, updatedEvent);
+            await _events.ReplaceOneAsync(e => e.Id == id && e.UserId == userId, updatedEvent);
         }
 
-        public async Task<bool> DeleteEventAsync(string id)
+        public async Task<bool> DeleteEventAsync(string id, string userId)
         {
-            var result = await _events.DeleteOneAsync(e => e.Id == id);
+            var result = await _events.DeleteOneAsync(e => e.Id == id && e.UserId == userId);
             return result.DeletedCount > 0;
         }
 
