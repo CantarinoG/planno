@@ -6,5 +6,6 @@ namespace Backend.Services
     {
         string HashPassword(string password);
         bool VerifyPassword(string password, string hash);
+        string GenerateJwtToken(string userId, string username, string email);
     }
 }
