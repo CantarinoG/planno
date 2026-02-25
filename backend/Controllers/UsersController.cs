@@ -1,6 +1,7 @@
 using Backend.Models;
 using Backend.Models.DTOs;
 using Backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -38,6 +39,14 @@ namespace Backend.Controllers
 
             var token = _authService.GenerateJwtToken(newUser.Id!, newUser.Username, newUser.Email);
 
+            Response.Cookies.Append("jwt", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false, // Set to true in production
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddDays(7)
+            });
+
             return Ok(new AuthResponse
             {
                 Token = token,
@@ -62,9 +71,37 @@ namespace Backend.Controllers
 
             var token = _authService.GenerateJwtToken(user.Id!, user.Username, user.Email);
 
+            Response.Cookies.Append("jwt", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false, // Set to true in production
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddDays(7)
+            });
+
             return Ok(new AuthResponse
             {
                 Token = token,
+                Username = user.Username,
+                Email = user.Email
+            });
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<ActionResult<AuthResponse>> GetCurrentUser()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var user = await _usersService.GetUserByIdAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            return Ok(new AuthResponse
+            {
+                Token = string.Empty,
                 Username = user.Username,
                 Email = user.Email
             });

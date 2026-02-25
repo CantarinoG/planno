@@ -4,7 +4,7 @@
     import { EventForm } from "$lib/eventForm.svelte";
 
     let {
-        isOpen = false,
+        isOpen = $bindable(false),
         date = "",
         initialTitle = "",
         initialDescription = "",

@@ -20,7 +20,7 @@ async function httpRequest<T>(
     endpoint: string,
     method: string = 'GET',
     body?: any,
-    options: RequestInit = {}
+    options: RequestInit & { silent?: boolean } = {}
 ): Promise<T> {
     const url = `${API_BASE_URL}/${endpoint}`;
     const headers = {
@@ -33,25 +33,29 @@ async function httpRequest<T>(
             method,
             headers,
             body: body ? JSON.stringify(body) : undefined,
+            credentials: 'include',
             ...options
         });
 
         if (!response.ok) {
-            let errorMessage = response.statusText;
+            const text = await response.text();
+            let errorMessage = text || response.statusText;
             try {
-                const errorData = await response.json();
+                const errorData = JSON.parse(text);
                 errorMessage = errorData.message || errorData.error || errorMessage;
             } catch {
-                errorMessage = await response.text() || errorMessage;
+                // Not JSON, use text
             }
 
             // Centralized Error Handling
-            if (response.status === 401) {
-                addToast("Unauthorized: Please log in again.", "error");
-            } else if (response.status === 403) {
-                addToast("Forbidden: You don't have permission for this action.", "error");
-            } else {
-                addToast(`API Error: ${errorMessage}`, "error");
+            if (!options.silent) {
+                if (response.status === 403) {
+                    addToast("Forbidden: You don't have permission for this action.", "error");
+                } else if (response.status === 401) {
+                    addToast("Invalid credentials. Please check your email and password.", "error");
+                } else {
+                    addToast(`API Error: ${errorMessage}`, "error");
+                }
             }
 
             throw new Error(errorMessage);
@@ -101,4 +105,8 @@ export async function registerUser(data: any): Promise<AuthResponse> {
 
 export async function loginUser(data: any): Promise<AuthResponse> {
     return httpRequest<AuthResponse>('users/login', 'POST', data);
+}
+
+export async function getCurrentUser(): Promise<AuthResponse> {
+    return httpRequest<AuthResponse>('users/me', 'GET', undefined, { silent: true });
 }
