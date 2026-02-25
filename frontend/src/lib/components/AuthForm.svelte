@@ -19,6 +19,28 @@
         e.preventDefault();
         // TODO: implement register API call
     }
+
+    const isLoginValid = $derived(
+        loginEmailUsername.trim().length > 0 && loginPassword.length > 0,
+    );
+
+    const passwordsMatch = $derived(
+        registerPassword.length > 0 &&
+            registerConfirmPassword.length > 0 &&
+            registerPassword === registerConfirmPassword,
+    );
+
+    const isEmailFormatValid = $derived(
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(registerEmail),
+    );
+
+    const isRegisterValid = $derived(
+        registerUsername.trim().length >= 3 &&
+            registerEmail.trim().length > 0 &&
+            isEmailFormatValid &&
+            registerPassword.length >= 6 &&
+            passwordsMatch,
+    );
 </script>
 
 <div class="w-full">
@@ -108,12 +130,11 @@
                     >
                         Password
                     </label>
-                    <a
-                        href="#"
-                        class="text-[10px] font-bold text-orange-600 hover:text-orange-700 tracking-wide uppercase transition-colors"
+                    <button
+                        class="text-[10px] font-bold text-orange-600 hover:text-orange-700 tracking-wide uppercase transition-colors cursor-pointer bg-transparent border-none p-0"
                     >
                         Forgot password?
-                    </a>
+                    </button>
                 </div>
                 <div class="relative group">
                     <div
@@ -154,7 +175,8 @@
 
             <button
                 type="submit"
-                class="w-full btn bg-orange-600 hover:bg-orange-700 text-white border-none font-bold rounded-xl shadow-lg shadow-orange-500/20 mt-2"
+                class="w-full btn bg-orange-600 hover:bg-orange-700 disabled:bg-base-300 disabled:text-base-content/30 text-white border-none font-bold rounded-xl shadow-lg shadow-orange-500/20 mt-2"
+                disabled={!isLoginValid}
             >
                 Sign In
             </button>
@@ -214,10 +236,20 @@
                         type="text"
                         placeholder="Your username"
                         bind:value={registerUsername}
-                        class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm"
+                        class="w-full pl-12 pr-4 py-3 bg-base-200/30 border {registerUsername &&
+                        registerUsername.trim().length < 3
+                            ? 'border-error'
+                            : 'border-base-300'} rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm"
                         required
                     />
                 </div>
+                {#if registerUsername && registerUsername.trim().length < 3}
+                    <p
+                        class="text-error text-[10px] font-bold uppercase px-1 mt-1"
+                    >
+                        Username must be at least 3 characters
+                    </p>
+                {/if}
             </div>
 
             <!-- Email Field -->
@@ -254,10 +286,20 @@
                         type="email"
                         placeholder="you@example.com"
                         bind:value={registerEmail}
-                        class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm"
+                        class="w-full pl-12 pr-4 py-3 bg-base-200/30 border {registerEmail &&
+                        !isEmailFormatValid
+                            ? 'border-error'
+                            : 'border-base-300'} rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm"
                         required
                     />
                 </div>
+                {#if registerEmail && !isEmailFormatValid}
+                    <p
+                        class="text-error text-[10px] font-bold uppercase px-1 mt-1"
+                    >
+                        Please enter a valid email address
+                    </p>
+                {/if}
             </div>
 
             <!-- Password Field -->
@@ -299,10 +341,20 @@
                         type="password"
                         placeholder="••••••••"
                         bind:value={registerPassword}
-                        class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm"
+                        class="w-full pl-12 pr-4 py-3 bg-base-200/30 border {registerPassword &&
+                        registerPassword.length < 6
+                            ? 'border-error'
+                            : 'border-base-300'} rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm"
                         required
                     />
                 </div>
+                {#if registerPassword && registerPassword.length < 6}
+                    <p
+                        class="text-error text-[10px] font-bold uppercase px-1 mt-1"
+                    >
+                        Password must be at least 6 characters
+                    </p>
+                {/if}
             </div>
 
             <!-- Confirm Password Field-->
@@ -344,15 +396,26 @@
                         type="password"
                         placeholder="••••••••"
                         bind:value={registerConfirmPassword}
-                        class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm"
+                        class="w-full pl-12 pr-4 py-3 bg-base-200/30 border {registerConfirmPassword &&
+                        !passwordsMatch
+                            ? 'border-error'
+                            : 'border-base-300'} rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm"
                         required
                     />
                 </div>
+                {#if registerConfirmPassword && !passwordsMatch}
+                    <p
+                        class="text-error text-[10px] font-bold uppercase px-1 mt-1"
+                    >
+                        Passwords do not match
+                    </p>
+                {/if}
             </div>
 
             <button
                 type="submit"
-                class="w-full btn bg-orange-600 hover:bg-orange-700 text-white border-none font-bold rounded-xl shadow-lg shadow-orange-500/20 mt-2"
+                class="w-full btn bg-orange-600 hover:bg-orange-700 disabled:bg-base-300 disabled:text-base-content/30 text-white border-none font-bold rounded-xl shadow-lg shadow-orange-500/20 mt-2"
+                disabled={!isRegisterValid}
             >
                 Create Account
             </button>
