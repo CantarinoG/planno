@@ -1,5 +1,6 @@
 <script lang="ts">
     import ThemeToggle from "$lib/components/ThemeToggle.svelte";
+    import AuthForm from "$lib/components/AuthForm.svelte";
 </script>
 
 <svelte:head>
@@ -94,9 +95,7 @@
         <!-- Centered form content -->
         <div class="flex-1 flex items-center justify-center px-8 py-12">
             <div class="w-full max-w-sm">
-                <p class="text-base-content/40 text-sm text-center italic">
-                    Form coming soon…
-                </p>
+                <AuthForm />
             </div>
         </div>
     </div>
