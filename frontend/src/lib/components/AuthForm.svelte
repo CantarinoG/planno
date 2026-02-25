@@ -10,14 +10,43 @@
     let registerPassword = $state("");
     let registerConfirmPassword = $state("");
 
-    function handleLogin(e: Event) {
+    import { loginUser, registerUser } from "$lib/api";
+    import { isLoading, addToast } from "$lib/stores";
+    import { goto } from "$app/navigation";
+
+    async function handleLogin(e: Event) {
         e.preventDefault();
-        // TODO: implement login API call
+        isLoading.set(true);
+        try {
+            await loginUser({
+                emailOrUsername: loginEmailUsername,
+                password: loginPassword,
+            });
+            addToast("Welcome back!", "success");
+            goto("/");
+        } catch (error: any) {
+            // Error is handled in api.ts helper
+        } finally {
+            isLoading.set(false);
+        }
     }
 
-    function handleRegister(e: Event) {
+    async function handleRegister(e: Event) {
         e.preventDefault();
-        // TODO: implement register API call
+        isLoading.set(true);
+        try {
+            await registerUser({
+                username: registerUsername,
+                email: registerEmail,
+                password: registerPassword,
+            });
+            addToast("Account created successfully!", "success");
+            goto("/");
+        } catch (error: any) {
+            // Error is handled in api.ts helper
+        } finally {
+            isLoading.set(false);
+        }
     }
 
     const isLoginValid = $derived(
@@ -112,7 +141,6 @@
                     </div>
                     <input
                         id="login-email"
-                        type="email"
                         placeholder="you@example.com"
                         bind:value={loginEmailUsername}
                         class="w-full pl-12 pr-4 py-3 bg-base-200/30 border border-base-300 rounded-xl focus:border-orange-500 focus:bg-base-100 transition-all outline-none font-medium text-base-content/80 text-sm"

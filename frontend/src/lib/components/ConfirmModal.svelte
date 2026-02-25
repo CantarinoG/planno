@@ -1,13 +1,22 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import { fade, scale } from "svelte/transition";
+    import { scale } from "svelte/transition";
 
-    export let isOpen: boolean = false;
-    export let title: string = "Confirm Action";
-    export let message: string = "Are you sure you want to proceed?";
-    export let confirmText: string = "Confirm";
-    export let cancelText: string = "Cancel";
-    export let type: "danger" | "warning" | "info" = "danger";
+    let {
+        isOpen = $bindable(false),
+        title = "Confirm Action",
+        message = "Are you sure you want to proceed?",
+        confirmText = "Confirm",
+        cancelText = "Cancel",
+        type = "danger",
+    } = $props<{
+        isOpen?: boolean;
+        title?: string;
+        message?: string;
+        confirmText?: string;
+        cancelText?: string;
+        type?: "danger" | "warning" | "info";
+    }>();
 
     const dispatch = createEventDispatcher<{
         confirm: void;
@@ -29,7 +38,7 @@
     }
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} />
 
 {#if isOpen}
     <div
@@ -48,7 +57,7 @@
             <div class="modal-action">
                 <button
                     class="btn btn-ghost font-bold text-base-content/60 hover:bg-base-300 px-6"
-                    on:click={handleCancel}>{cancelText}</button
+                    onclick={handleCancel}>{cancelText}</button
                 >
                 <button
                     class="btn border-none font-bold px-8 shadow-lg text-white {type ===
@@ -57,7 +66,7 @@
                         : type === 'warning'
                           ? 'bg-yellow-500 hover:bg-yellow-600 shadow-yellow-500/20'
                           : 'bg-orange-600 hover:bg-orange-700 shadow-orange-500/20'}"
-                    on:click={handleConfirm}
+                    onclick={handleConfirm}
                 >
                     {confirmText}
                 </button>
@@ -68,8 +77,8 @@
             role="button"
             tabindex="0"
             aria-label="Close modal"
-            on:click={handleCancel}
-            on:keydown={(e) => {
+            onclick={handleCancel}
+            onkeydown={(e) => {
                 if (e.key === "Enter" || e.key === " ") handleCancel();
             }}
         >

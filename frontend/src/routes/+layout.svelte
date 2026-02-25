@@ -2,10 +2,31 @@
 	import "./layout.css";
 	import favicon from "$lib/assets/favicon.svg";
 	import Toast from "$lib/components/Toast.svelte";
-	import { isLoading, theme } from "$lib/stores";
+	import { isLoading, theme, user } from "$lib/stores";
 	import { onMount } from "svelte";
+	import { getCurrentUser } from "$lib/api";
+	import { page } from "$app/state";
+	import { goto } from "$app/navigation";
 
 	let { children } = $props();
+
+	onMount(async () => {
+		try {
+			const userData = await getCurrentUser();
+			user.set({
+				username: userData.username,
+				email: userData.email,
+			});
+
+			if (page.url.pathname === "/auth") {
+				goto("/");
+			}
+		} catch (error) {
+			if (page.url.pathname !== "/auth") {
+				goto("/auth");
+			}
+		}
+	});
 
 	$effect(() => {
 		if (typeof document !== "undefined") {

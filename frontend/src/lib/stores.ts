@@ -46,3 +46,10 @@ if (typeof window !== "undefined") {
 export const toggleTheme = () => {
     theme.update((current) => (current === "light" ? "dark" : "light"));
 };
+
+export interface UserProfile {
+    username: string;
+    email: string;
+}
+
+export const user = writable<UserProfile | null>(null);

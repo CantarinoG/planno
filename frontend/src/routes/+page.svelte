@@ -19,7 +19,7 @@
         updateCalendarEvent,
         type CalendarEvent,
     } from "$lib/api";
-    import { isLoading, addToast } from "$lib/stores";
+    import { isLoading, addToast, user } from "$lib/stores";
 
     import ConfirmModal from "$lib/components/ConfirmModal.svelte";
 
@@ -48,9 +48,12 @@
             console.log(`Fetching events from ${start} to ${end}`);
             events = await getCalendarEvents(start, end);
             console.log("Fetched events:", events);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to load events:", error);
-            addToast("Failed to load events", "error");
+            // Only show toast if it's not an auth error (handled by redirection)
+            if (error.message !== "Unauthorized") {
+                addToast("Failed to load events", "error");
+            }
         } finally {
             isLoading.set(false);
         }
@@ -218,7 +221,7 @@
     $: weekStart = startOfWeek(currentDate, { weekStartsOn: 0 });
     $: weekEnd = endOfWeek(currentDate, { weekStartsOn: 0 });
 
-    $: if (weekStart && weekEnd) {
+    $: if (weekStart && weekEnd && $user) {
         loadEvents();
     }
 
