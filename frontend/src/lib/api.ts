@@ -110,3 +110,7 @@ export async function loginUser(data: any): Promise<AuthResponse> {
 export async function getCurrentUser(): Promise<AuthResponse> {
     return httpRequest<AuthResponse>('users/me', 'GET', undefined, { silent: true });
 }
+
+export async function logout(): Promise<void> {
+    return httpRequest<void>('users/logout', 'POST');
+}

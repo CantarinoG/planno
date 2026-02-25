@@ -106,5 +106,18 @@ namespace Backend.Controllers
                 Email = user.Email
             });
         }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Append("jwt", "", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false, // Set to true in production
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddDays(-1)
+            });
+            return Ok(new { message = "Logged out successfully" });
+        }
     }
 }
