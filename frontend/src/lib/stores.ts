@@ -53,3 +53,17 @@ export interface UserProfile {
 }
 
 export const user = writable<UserProfile | null>(null);
+
+export const logoutUser = async () => {
+    try {
+        const { logout } = await import("./api");
+        await logout();
+    } catch (e) {
+        console.error("Logout failed:", e);
+    } finally {
+        user.set(null);
+        if (typeof window !== "undefined") {
+            window.location.href = "/auth";
+        }
+    }
+};

@@ -11,16 +11,20 @@
     let registerConfirmPassword = $state("");
 
     import { loginUser, registerUser } from "$lib/api";
-    import { isLoading, addToast } from "$lib/stores";
+    import { isLoading, addToast, user } from "$lib/stores";
     import { goto } from "$app/navigation";
 
     async function handleLogin(e: Event) {
         e.preventDefault();
         isLoading.set(true);
         try {
-            await loginUser({
+            const response = await loginUser({
                 emailOrUsername: loginEmailUsername,
                 password: loginPassword,
+            });
+            user.set({
+                username: response.username,
+                email: response.email,
             });
             addToast("Welcome back!", "success");
             goto("/");
@@ -35,10 +39,14 @@
         e.preventDefault();
         isLoading.set(true);
         try {
-            await registerUser({
+            const response = await registerUser({
                 username: registerUsername,
                 email: registerEmail,
                 password: registerPassword,
+            });
+            user.set({
+                username: response.username,
+                email: response.email,
             });
             addToast("Account created successfully!", "success");
             goto("/");
