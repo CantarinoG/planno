@@ -88,3 +88,17 @@ export async function deleteCalendarEvent(id: string): Promise<void> {
 export async function updateCalendarEvent(id: string, event: Partial<CalendarEvent>): Promise<void> {
     return httpRequest<void>(`Events/${id}`, 'PUT', event);
 }
+
+export interface AuthResponse {
+    token: string;
+    username: string;
+    email: string;
+}
+
+export async function registerUser(data: any): Promise<AuthResponse> {
+    return httpRequest<AuthResponse>('users/register', 'POST', data);
+}
+
+export async function loginUser(data: any): Promise<AuthResponse> {
+    return httpRequest<AuthResponse>('users/login', 'POST', data);
+}
