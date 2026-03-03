@@ -8,5 +8,6 @@ namespace Backend.Services
         Task<User?> GetUserByEmailAsync(string email);
         Task<User?> GetUserByUsernameAsync(string username);
         Task<User?> GetUserByIdAsync(string id);
+        Task UpdateUserPasswordAsync(string id, string passwordHash);
     }
 }

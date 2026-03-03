@@ -119,5 +119,26 @@ namespace Backend.Controllers
             });
             return Ok(new { message = "Logged out successfully" });
         }
+
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var user = await _usersService.GetUserByIdAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            if (!_authService.VerifyPassword(request.CurrentPassword, user.PasswordHash))
+                return BadRequest("Incorrect current password.");
+
+            var newPasswordHash = _authService.HashPassword(request.NewPassword);
+            await _usersService.UpdateUserPasswordAsync(userId, newPasswordHash);
+
+            return Ok(new { message = "Password changed successfully." });
+        }
     }
 }
