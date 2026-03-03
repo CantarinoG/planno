@@ -32,5 +32,11 @@ namespace Backend.Services
         {
             return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
         }
+
+        public async Task UpdateUserPasswordAsync(string id, string passwordHash)
+        {
+            var update = Builders<User>.Update.Set(u => u.PasswordHash, passwordHash);
+            await _users.UpdateOneAsync(u => u.Id == id, update);
+        }
     }
 }
