@@ -43,6 +43,12 @@ LetsPlan is a full-stack calendar application that allows users to create, manag
 - ✅ **Color Coding**: Customize event colors for better organization
 - ✅ **Event Overlapping**: Smart layout for concurrent events
 
+### Authentication & Account
+- 🔑 **Secure Authentication**: Register and login with email or username
+- 👤 **User Profiles**: View account information and custom initials avatar
+- 🔒 **Account Security**: Secure password change functionality
+- 🚪 **Session Management**: JWT-based authentication with secure cookies
+
 ### Calendar Navigation
 - 📅 **Weekly View**: Display events in a weekly grid format
 - 🗓️ **Mini Calendar**: Side panel date picker for quick navigation
@@ -57,6 +63,7 @@ LetsPlan is a full-stack calendar application that allows users to create, manag
 
 ### User Experience
 - 🌓 **Dark/Light Mode**: Toggle between themes
+- 👤 **Profile Dropdown**: Access account settings and logout from the navbar
 - 📱 **Responsive Design**: Optimized for all screen sizes
 - ⚡ **Real-time Updates**: Instant UI updates on event changes
 - 🎨 **Modern UI**: Clean, professional interface with smooth animations
@@ -88,6 +95,7 @@ LetsPlan is a full-stack calendar application that allows users to create, manag
 ### Backend
 - **Framework**: [.NET 8.0](https://dotnet.microsoft.com/) - Modern web API framework
 - **Language**: C# 12 - Type-safe, object-oriented language
+- **Authentication**: [JWT](https://jwt.io/) (JSON Web Tokens) with HttpOnly Cookies
 - **Database Driver**: [MongoDB.Driver 2.25](https://www.mongodb.com/docs/drivers/csharp/) - Official MongoDB C# driver
 - **API Style**: RESTful API with JSON responses
 
@@ -252,8 +260,10 @@ letsplan/
 │   │   │   ├── eventForm.svelte.ts  # Event form state
 │   │   │   └── constants/      # Application constants
 │   │   ├── routes/
-│   │   │   └── +page.svelte    # Main calendar page
-│   │   └── app.html            # HTML template
+│   │   │   ├── auth/
+│   │   │   │   └── +page.svelte    # Login and Registration page
+│   │   │   └── +page.svelte        # Main calendar page
+│   │   └── app.html                # HTML template
 │   ├── static/                 # Static assets (favicon, etc.)
 │   ├── tests/
 │   │   └── browser.spec.ts     # Playwright E2E tests
@@ -267,9 +277,13 @@ letsplan/
 │
 ├── backend/                     # .NET backend API
 │   ├── Controllers/
-│   │   └── EventsController.cs # REST API endpoints
+│   │   ├── EventsController.cs # Event API endpoints
+│   │   └── UsersController.cs  # Auth & User API endpoints
 │   ├── Models/
-│   │   └── CalendarEvent.cs    # Event data model
+│   │   ├── DTOs/
+│   │   │   └── ChangePasswordRequest.cs # Password update payload
+│   │   ├── CalendarEvent.cs    # Event data model
+│   │   └── User.cs             # User data model
 │   ├── Services/
 │   │   ├── MongoDbService.cs   # MongoDB connection service
 │   │   └── EventsService.cs    # Business logic for events
@@ -294,9 +308,13 @@ letsplan/
 - **`stores.ts`**: Reactive state management using Svelte stores
 
 #### Backend
-- **`EventsController.cs`**: RESTful API endpoints (GET, POST, PUT, DELETE)
-- **`CalendarEvent.cs`**: MongoDB document model with BSON attributes
-- **`EventsService.cs`**: Business logic layer between controller and database
+- **`EventsController.cs`**: RESTful API endpoints for events
+- **`UsersController.cs`**: Authentication and profile management
+- **`CalendarEvent.cs`**: MongoDB document model for events
+- **`User.cs`**: User account model with hashed passwords
+- **`EventsService.cs`**: Business logic for event management
+- **`UsersService.cs`**: User data handling and persistence
+- **`AuthService.cs`**: JWT generation and password hashing
 - **`MongoDbService.cs`**: Database connection and initialization
 
 ## 📡 API Documentation
@@ -445,6 +463,47 @@ DELETE /api/events/{id}
 | `color` | string | No | Hex color code (default: `#3b82f6`) |
 | `createdAt` | DateTime (UTC) | Auto-generated | Creation timestamp |
 | `updatedAt` | DateTime (UTC) | Auto-generated | Last update timestamp |
+
+### Users API
+
+#### Register User
+```http
+POST /api/users/register
+Content-Type: application/json
+
+{
+  "username": "johndoe",
+  "email": "john@example.com",
+  "password": "securepassword123"
+}
+```
+
+#### Login User
+```http
+POST /api/users/login
+Content-Type: application/json
+
+{
+  "emailOrUsername": "johndoe",
+  "password": "securepassword123"
+}
+```
+
+#### Change Password
+```http
+POST /api/users/change-password
+Authorization: Bearer <token> (or JWT Cookie)
+
+{
+  "currentPassword": "oldpassword",
+  "newPassword": "newpassword123"
+}
+```
+
+#### Logout
+```http
+POST /api/users/logout
+```
 
 ---
 
