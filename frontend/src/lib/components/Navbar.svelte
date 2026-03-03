@@ -1,12 +1,23 @@
 <script lang="ts">
-    export let toggleSidebar: () => void = () => {};
-    export let dateRangeString: string = "";
-    export let onNext: () => void = () => {};
-    export let onPrev: () => void = () => {};
-    export let onToday: () => void = () => {};
+    let {
+        toggleSidebar = () => {},
+        dateRangeString = "",
+        onNext = () => {},
+        onPrev = () => {},
+        onToday = () => {},
+    } = $props<{
+        toggleSidebar?: () => void;
+        dateRangeString?: string;
+        onNext?: () => void;
+        onPrev?: () => void;
+        onToday?: () => void;
+    }>();
 
     import ThemeToggle from "./ThemeToggle.svelte";
+    import ChangePasswordModal from "./ChangePasswordModal.svelte";
     import { user, logoutUser } from "$lib/stores";
+
+    let isChangePasswordModalOpen = $state(false);
 </script>
 
 <nav class="navbar bg-base-100 border-b border-base-300 px-4 py-2">
@@ -117,31 +128,100 @@
     <div class="navbar-end gap-1">
         <ThemeToggle />
         {#if $user}
-            <button
-                class="btn btn-ghost btn-circle btn-sm text-error hover:bg-error/10 ml-1"
-                onclick={logoutUser}
-                aria-label="Logout"
-                title="Logout"
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    ><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
-                    ></path><polyline points="16 17 21 12 16 7"></polyline><line
-                        x1="21"
-                        y1="12"
-                        x2="9"
-                        y2="12"
-                    ></line></svg
+            <div class="dropdown dropdown-end ml-1">
+                <button
+                    tabindex="0"
+                    class="btn btn-ghost btn-circle avatar placeholder bg-orange-600 transition-all hover:bg-orange-600/60"
                 >
-            </button>
+                    <div
+                        class="w-8 rounded-full text-base-content/70 flex items-center justify-center"
+                    >
+                        <span class="text-xs font-bold text-whited"
+                            >{$user.username
+                                .substring(0, 2)
+                                .toUpperCase()}</span
+                        >
+                    </div>
+                </button>
+                <ul
+                    tabindex="0"
+                    role="menu"
+                    class="mt-3 z-[1] p-2 shadow-2xl menu menu-sm dropdown-content bg-base-100 rounded-2xl w-64 border border-base-300"
+                >
+                    <li
+                        class="px-4 py-3 border-b border-base-200 mb-2"
+                        role="none"
+                    >
+                        <div
+                            class="flex flex-col gap-0.5 p-0 hover:bg-transparent"
+                            role="menuitem"
+                            tabindex="-1"
+                        >
+                            <span class="text-sm font-bold text-base-content"
+                                >{$user.username}</span
+                            >
+                            <span class="text-xs text-base-content/50"
+                                >{$user.email}</span
+                            >
+                        </div>
+                    </li>
+                    <li role="none">
+                        <button
+                            role="menuitem"
+                            class="flex items-center gap-3 py-2.5 rounded-xl hover:bg-base-200"
+                            onclick={() => (isChangePasswordModalOpen = true)}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                ><rect
+                                    x="3"
+                                    y="11"
+                                    width="18"
+                                    height="11"
+                                    rx="2"
+                                    ry="2"
+                                /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg
+                            >
+                            Change Password
+                        </button>
+                    </li>
+                    <li role="none">
+                        <button
+                            role="menuitem"
+                            class="flex items-center gap-3 py-2.5 rounded-xl text-error hover:bg-error/10"
+                            onclick={logoutUser}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                ><path
+                                    d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                                ></path><polyline points="16 17 21 12 16 7"
+                                ></polyline><line x1="21" y1="12" x2="9" y2="12"
+                                ></line></svg
+                            >
+                            Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
         {/if}
     </div>
 </nav>
+
+<ChangePasswordModal bind:isOpen={isChangePasswordModalOpen} />

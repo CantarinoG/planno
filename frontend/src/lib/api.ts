@@ -114,3 +114,7 @@ export async function getCurrentUser(): Promise<AuthResponse> {
 export async function logout(): Promise<void> {
     return httpRequest<void>('users/logout', 'POST');
 }
+
+export async function changePassword(data: any): Promise<void> {
+    return httpRequest<void>('users/change-password', 'POST', data);
+}
