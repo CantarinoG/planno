@@ -167,7 +167,13 @@
                         Password
                     </label>
                     <button
+                        type="button"
                         class="text-[10px] font-bold text-orange-600 hover:text-orange-700 tracking-wide uppercase transition-colors cursor-pointer bg-transparent border-none p-0"
+                        onclick={() =>
+                            addToast(
+                                "Forgot password functionality is not implemented yet.",
+                                "info",
+                            )}
                     >
                         Forgot password?
                     </button>
