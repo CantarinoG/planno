@@ -12,6 +12,7 @@ namespace Backend.Controllers
     public class EventsController : ControllerBase
     {
         private string GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        private string GetUserEmail() => User.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
         private readonly IEventsService _eventsService;
 
         public EventsController(IEventsService eventsService)
@@ -49,7 +50,7 @@ namespace Backend.Controllers
             calendarEvent.UserId = GetUserId();
             try
             {
-                var createdEvent = await _eventsService.CreateEventAsync(calendarEvent);
+                var createdEvent = await _eventsService.CreateEventAsync(calendarEvent, GetUserEmail());
                 return CreatedAtAction(nameof(GetById), new { id = createdEvent.Id }, createdEvent);
             }
             catch (ArgumentException ex)
@@ -64,7 +65,7 @@ namespace Backend.Controllers
             var userId = GetUserId();
             try
             {
-                await _eventsService.UpdateEventAsync(id, userId, updatedEvent);
+                await _eventsService.UpdateEventAsync(id, userId, updatedEvent, GetUserEmail());
                 return NoContent();
             }
             catch (ArgumentException ex)
@@ -81,7 +82,7 @@ namespace Backend.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var userId = GetUserId();
-            var deleted = await _eventsService.DeleteEventAsync(id, userId);
+            var deleted = await _eventsService.DeleteEventAsync(id, userId, GetUserEmail());
 
             if (!deleted)
             {

@@ -1,5 +1,6 @@
 using Backend.Configurations;
 using Backend.Services;
+using Confluent.Kafka;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,15 @@ builder.Services.AddScoped(sp =>
 builder.Services.AddScoped<IEventsService, EventsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
+
+builder.Services.AddSingleton<IProducer<string, string>>(sp =>
+{
+    var config = new ProducerConfig { 
+        BootstrapServers = builder.Configuration["KafkaSettings:BootstrapServers"] ?? "kafka:9092",
+        MessageTimeoutMs = 5000
+    };
+    return new ProducerBuilder<string, string>(config).Build();
+});
 
 builder.Services.AddAuthentication(options =>
 {
