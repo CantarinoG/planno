@@ -7,11 +7,15 @@ services:
       - backend
 
   backend:
-    build: ./backend
+    build: ./api
     ports:
       - "5000:8080"
     depends_on:
       - mongo
+
+  worker:
+    build: ./worker
+    depends_on:
       - kafka
 
   mongo:
