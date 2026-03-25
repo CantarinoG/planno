@@ -18,6 +18,12 @@ services:
     build: ./worker
     depends_on:
       - kafka
+    environment:
+      - EmailSettings__SmtpHost=${SMTP_HOST}
+      - EmailSettings__SmtpPort=${SMTP_PORT}
+      - EmailSettings__SmtpUser=${SMTP_USER}
+      - EmailSettings__SmtpPass=${SMTP_PASS}
+      - EmailSettings__FromEmail=${FROM_EMAIL}
 
   mongo:
     image: mongo:7

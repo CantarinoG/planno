@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Confluent.Kafka;
+using NotificationWorker.Services;
 
 namespace NotificationWorker;
 
@@ -7,11 +8,13 @@ public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
     private readonly IConfiguration _configuration;
+    private readonly IEmailService _emailService;
 
-    public Worker(ILogger<Worker> logger, IConfiguration configuration)
+    public Worker(ILogger<Worker> logger, IConfiguration configuration, IEmailService emailService)
     {
         _logger = logger;
         _configuration = configuration;
+        _emailService = emailService;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -43,7 +46,7 @@ public class Worker : BackgroundService
                     {
                         _logger.LogInformation("Received message: Key={key}, Value={value}", result.Message.Key, result.Message.Value);
                         
-                        ProcessNotification(result.Message.Value);
+                        await ProcessNotification(result.Message.Value);
                     }
                 }
                 catch (ConsumeException e)
@@ -62,7 +65,7 @@ public class Worker : BackgroundService
         }
     }
 
-    private void ProcessNotification(string messageValue)
+    private async Task ProcessNotification(string messageValue)
     {
         try
         {
@@ -73,6 +76,17 @@ public class Worker : BackgroundService
             var email = data.TryGetProperty("Email", out var emailProp) ? emailProp.GetString() : "Unknown Email";
 
             _logger.LogInformation("🔔 NOTIFICATION: Event '{title}' (ID: {id}) was {action}! Target: {email}", title, id, action, email);
+
+            if (email != "Unknown Email")
+            {
+                var subject = $"LetsPlan: Event {action}";
+                var body = $@"
+                    <h2>LetsPlan Notification</h2>
+                    <p>The event <strong>{title}</strong> has been {action.ToLower()}.</p>
+                    <p><small>Event ID: {id}</small></p>";
+                
+                await _emailService.SendEmailAsync(email, subject, body);
+            }
         }
         catch (Exception ex)
         {
