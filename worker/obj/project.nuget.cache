@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "YjhxUWUtkmE=",
+  "dgSpecHash": "+V3iarKqpjA=",
   "success": true,
   "projectFilePath": "/home/cantarino/Desktop/letsplan/worker/NotificationWorker.csproj",
   "expectedPackageFiles": [
+    "/home/cantarino/.nuget/packages/confluent.kafka/2.13.2/confluent.kafka.2.13.2.nupkg.sha512",
+    "/home/cantarino/.nuget/packages/librdkafka.redist/2.13.2/librdkafka.redist.2.13.2.nupkg.sha512",
     "/home/cantarino/.nuget/packages/microsoft.extensions.configuration/8.0.0/microsoft.extensions.configuration.8.0.0.nupkg.sha512",
     "/home/cantarino/.nuget/packages/microsoft.extensions.configuration.abstractions/8.0.0/microsoft.extensions.configuration.abstractions.8.0.0.nupkg.sha512",
     "/home/cantarino/.nuget/packages/microsoft.extensions.configuration.binder/8.0.2/microsoft.extensions.configuration.binder.8.0.2.nupkg.sha512",
