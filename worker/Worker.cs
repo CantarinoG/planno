@@ -70,8 +70,9 @@ public class Worker : BackgroundService
             var action = data.GetProperty("Action").GetString();
             var title = data.GetProperty("Title").GetString();
             var id = data.GetProperty("EventId").GetString();
+            var email = data.TryGetProperty("Email", out var emailProp) ? emailProp.GetString() : "Unknown Email";
 
-            _logger.LogInformation("🔔 NOTIFICATION: Event '{title}' (ID: {id}) was {action}!", title, id, action);
+            _logger.LogInformation("🔔 NOTIFICATION: Event '{title}' (ID: {id}) was {action}! Target: {email}", title, id, action, email);
         }
         catch (Exception ex)
         {

@@ -18,12 +18,13 @@ namespace Backend.Services
             _eventsTopic = configuration["KafkaSettings:EventsTopic"] ?? "calendar-events";
         }
 
-        private async Task PublishKafkaEventAsync(string eventId, string userId, string title, EventAction action)
+        private async Task PublishKafkaEventAsync(string eventId, string userId, string userEmail, string title, EventAction action)
         {
             var payload = JsonSerializer.Serialize(new { 
                 EventId = eventId, 
                 Title = title, 
-                Action = action.ToString() 
+                Action = action.ToString(),
+                Email = userEmail
             });
 
             await _kafkaProducer.ProduceAsync(_eventsTopic, new Message<string, string> { 
@@ -65,17 +66,17 @@ namespace Backend.Services
             return await _events.Find(e => e.Id == id && e.UserId == userId).FirstOrDefaultAsync();
         }
 
-        public async Task<CalendarEvent> CreateEventAsync(CalendarEvent calendarEvent)
+        public async Task<CalendarEvent> CreateEventAsync(CalendarEvent calendarEvent, string userEmail)
         {
             ValidateEvent(calendarEvent);
 
             await _events.InsertOneAsync(calendarEvent);
-            await PublishKafkaEventAsync(calendarEvent.Id, calendarEvent.UserId, calendarEvent.Title, EventAction.CREATED);
+            await PublishKafkaEventAsync(calendarEvent.Id, calendarEvent.UserId, userEmail, calendarEvent.Title, EventAction.CREATED);
 
             return calendarEvent;
         }
 
-        public async Task UpdateEventAsync(string id, string userId, CalendarEvent updatedEvent)
+        public async Task UpdateEventAsync(string id, string userId, CalendarEvent updatedEvent, string userEmail)
         {
             ValidateEvent(updatedEvent);
 
@@ -90,10 +91,10 @@ namespace Backend.Services
             updatedEvent.UpdatedAt = DateTime.UtcNow;
             await _events.ReplaceOneAsync(e => e.Id == id && e.UserId == userId, updatedEvent);
 
-            await PublishKafkaEventAsync(id, userId, updatedEvent.Title, EventAction.UPDATED);
+            await PublishKafkaEventAsync(id, userId, userEmail, updatedEvent.Title, EventAction.UPDATED);
         }
 
-        public async Task<bool> DeleteEventAsync(string id, string userId)
+        public async Task<bool> DeleteEventAsync(string id, string userId, string userEmail)
         {
             var eventFound = await _events.Find(e => e.Id == id && e.UserId == userId).FirstOrDefaultAsync();
             
@@ -101,7 +102,7 @@ namespace Backend.Services
             
             if (result.DeletedCount > 0 && eventFound != null)
             {
-                await PublishKafkaEventAsync(id, userId, eventFound.Title, EventAction.DELETED);
+                await PublishKafkaEventAsync(id, userId, userEmail, eventFound.Title, EventAction.DELETED);
             }
             
             return result.DeletedCount > 0;
